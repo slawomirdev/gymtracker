@@ -31,6 +31,12 @@ public class ExerciseService {
     }
 
     @Transactional(readOnly = true)
+    public List<Exercise> listActiveExercises() {
+        AppUser user = userService.getCurrentUser();
+        return exerciseRepository.findAllByUserIdAndActiveTrueOrderByNameAsc(user.getId());
+    }
+
+    @Transactional(readOnly = true)
     public Exercise getExercise(Long id) {
         AppUser user = userService.getCurrentUser();
         return exerciseRepository.findById(id)
@@ -45,6 +51,7 @@ public class ExerciseService {
         exercise.setUser(user);
         exercise.setName(request.name());
         exercise.setDescription(request.description());
+        exercise.setActive(request.active() == null || request.active());
         Exercise saved = exerciseRepository.save(exercise);
         logger.info("Created exercise {} for user {}", saved.getId(), user.getId());
         return saved;
@@ -55,6 +62,9 @@ public class ExerciseService {
         Exercise exercise = getExercise(id);
         exercise.setName(request.name());
         exercise.setDescription(request.description());
+        if (request.active() != null) {
+            exercise.setActive(request.active());
+        }
         return exerciseRepository.save(exercise);
     }
 

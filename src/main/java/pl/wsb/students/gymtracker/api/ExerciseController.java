@@ -62,6 +62,11 @@ public class ExerciseController {
     }
 
     private ExerciseResponse toResponse(Exercise exercise) {
-        return new ExerciseResponse(exercise.getId(), exercise.getName(), exercise.getDescription());
+        return new ExerciseResponse(
+                exercise.getId(),
+                exercise.getName(),
+                exercise.getDescription(),
+                exercise.getActive()
+        );
     }
 }

@@ -17,12 +17,12 @@
     <div class="container">
         <a class="navbar-brand gt-brand" href="/">GymTracker</a>
         <ul class="nav nav-pills gap-2">
-            <li class="nav-item"><a class="nav-link active" href="/">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/">Pulpit</a></li>
             <li class="nav-item"><a class="nav-link" href="/history">Historia</a></li>
             <li class="nav-item"><a class="nav-link" href="/stats">Statystyki</a></li>
             <li class="nav-item"><a class="nav-link" href="/manage">Zarzadzaj</a></li>
         </ul>
-        <span class="gt-pill d-none d-lg-inline">Plan. Train. Track.</span>
+        <span class="gt-pill d-none d-lg-inline">Planuj. Trenuj. Analizuj.</span>
     </div>
 </nav>
 
@@ -36,7 +36,7 @@
                     Szybko dodawaj treningi, zapisuj serie i analizuj progres. Wszystko w lekkim, czytelnym widoku.
                 </p>
                 <div class="d-flex flex-wrap gap-3">
-                    <a class="btn btn-gt btn-lg" href="/manage">Zarzadzaj treningami</a>
+                    <a class="btn btn-gt btn-lg" href="/manage">Zarzadzaj danymi</a>
                     <a class="btn btn-gt-outline btn-lg" href="/history">Zobacz historie</a>
                 </div>
             </div>
@@ -67,10 +67,41 @@
                         <input class="form-control" type="text" name="description"
                                placeholder="opis lub wskazowka techniczna">
                     </div>
+                    <div class="col-12 form-check">
+                        <input class="form-check-input" type="checkbox" name="active" value="true" checked>
+                        <label class="form-check-label">Aktywne cwiczenie</label>
+                    </div>
                     <div class="col-12">
                         <button class="btn btn-gt-outline w-100">Dodaj cwiczenie</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-4">
+        <div class="col-md-3">
+            <div class="gt-card gt-card-muted p-3 text-center">
+                <div class="text-muted">Liczba treningow</div>
+                <div class="fs-4 fw-semibold" th:text="${summary.totalTrainings}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="gt-card gt-card-muted p-3 text-center">
+                <div class="text-muted">Liczba serii</div>
+                <div class="fs-4 fw-semibold" th:text="${summary.totalSets}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="gt-card gt-card-muted p-3 text-center">
+                <div class="text-muted">Cwiczenia</div>
+                <div class="fs-4 fw-semibold" th:text="${summary.totalExercises}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="gt-card gt-card-muted p-3 text-center">
+                <div class="text-muted">Objetosc (kg)</div>
+                <div class="fs-4 fw-semibold" th:text="${summary.totalVolume}">0</div>
             </div>
         </div>
     </div>
@@ -86,7 +117,9 @@
                             <div class="fw-semibold" th:text="${exercise.name}">Nazwa</div>
                             <small class="text-muted" th:text="${exercise.description}">Opis</small>
                         </div>
-                        <span class="gt-chip">aktywny</span>
+                        <span class="gt-chip"
+                              th:classappend="${exercise.active} ? '' : ' gt-chip--inactive'"
+                              th:text="${exercise.active} ? 'aktywny' : 'nieaktywny'">aktywny</span>
                     </div>
                 </div>
             </div>
@@ -140,7 +173,7 @@
                         <div class="col-md-5">
                             <select class="form-select" name="exerciseId" required>
                                 <option value="">Wybierz cwiczenie</option>
-                                <option th:each="exercise : ${exercises}"
+                                <option th:each="exercise : ${activeExercises}"
                                         th:value="${exercise.id}"
                                         th:text="${exercise.name}">Cwiczenie</option>
                             </select>
@@ -157,6 +190,12 @@
                             <button class="btn btn-gt">+</button>
                         </div>
                     </form>
+                </div>
+                <div class="d-flex justify-content-between align-items-center"
+                     th:if="${trainings.size() == trainingLimit && trainingLimit < 50}">
+                    <a class="btn btn-gt-outline btn-sm"
+                       th:href="@{'/?limit=' + ${trainingNextLimit}}">Pokaz wiecej treningow</a>
+                    <a class="btn btn-link text-decoration-none" href="/manage">Zobacz wszystkie</a>
                 </div>
             </div>
         </div>

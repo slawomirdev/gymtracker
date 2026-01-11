@@ -34,7 +34,7 @@ class ExerciseServiceTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(exerciseRepository.save(any(Exercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ExerciseRequest request = new ExerciseRequest("Wyciskanie", "Sila klatki");
+        ExerciseRequest request = new ExerciseRequest("Wyciskanie", "Sila klatki", true);
         Exercise saved = exerciseService.createExercise(request);
 
         assertThat(saved.getUser()).isEqualTo(user);

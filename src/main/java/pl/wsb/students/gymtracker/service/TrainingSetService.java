@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
 import pl.wsb.students.gymtracker.api.dto.TrainingSetRequest;
 import pl.wsb.students.gymtracker.api.error.NotFoundException;
 import pl.wsb.students.gymtracker.domain.Exercise;
@@ -58,5 +59,14 @@ public class TrainingSetService {
     public List<TrainingSet> history(Long exerciseId, Long userId) {
         return trainingSetRepository.findByExerciseIdAndTrainingUserIdOrderByTrainingTrainingDateDesc(
                 exerciseId, userId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TrainingSet> history(Long exerciseId, Long userId, int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 100));
+        var page = PageRequest.of(0, safeLimit);
+        return trainingSetRepository
+                .findByExerciseIdAndTrainingUserIdOrderByTrainingTrainingDateDesc(exerciseId, userId, page)
+                .getContent();
     }
 }

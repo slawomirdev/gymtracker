@@ -39,18 +39,27 @@ public class UiController {
     }
 
     @GetMapping("/")
-    public String index(Model model) {
+    public String index(@RequestParam(defaultValue = "5") int limit, Model model) {
         model.addAttribute("exercises", exerciseService.listExercises());
-        model.addAttribute("trainings", trainingService.listTrainings());
+        model.addAttribute("activeExercises", exerciseService.listActiveExercises());
+        model.addAttribute("trainings", trainingService.listTrainingsLimited(limit));
+        model.addAttribute("trainingLimit", limit);
+        model.addAttribute("trainingNextLimit", Math.min(limit + 5, 50));
+        model.addAttribute("summary", statsService.summary());
         return "index";
     }
 
     @GetMapping("/history")
-    public String history(@RequestParam(required = false) Long exerciseId, Model model) {
+    public String history(@RequestParam(required = false) Long exerciseId,
+                          @RequestParam(defaultValue = "20") int limit,
+                          Model model) {
         model.addAttribute("exercises", exerciseService.listExercises());
         model.addAttribute("selectedExerciseId", exerciseId);
+        model.addAttribute("historyLimit", limit);
+        model.addAttribute("historyNextLimit", Math.min(limit + 20, 100));
         if (exerciseId != null) {
-            model.addAttribute("history", trainingSetService.history(exerciseId, userService.getCurrentUserId()));
+            model.addAttribute("history", trainingSetService.history(
+                    exerciseId, userService.getCurrentUserId(), limit));
         }
         return "history";
     }
@@ -72,8 +81,9 @@ public class UiController {
     @PostMapping("/ui/exercises")
     public String addExercise(@RequestParam String name,
                               @RequestParam(required = false) String description,
+                              @RequestParam(defaultValue = "false") boolean active,
                               RedirectAttributes redirectAttributes) {
-        exerciseService.createExercise(new ExerciseRequest(name, description));
+        exerciseService.createExercise(new ExerciseRequest(name, description, active));
         redirectAttributes.addFlashAttribute("message", "Exercise added.");
         return "redirect:/";
     }
@@ -91,8 +101,9 @@ public class UiController {
     public String updateExercise(@PathVariable Long id,
                                  @RequestParam String name,
                                  @RequestParam(required = false) String description,
+                                 @RequestParam(defaultValue = "false") boolean active,
                                  RedirectAttributes redirectAttributes) {
-        exerciseService.updateExercise(id, new ExerciseRequest(name, description));
+        exerciseService.updateExercise(id, new ExerciseRequest(name, description, active));
         redirectAttributes.addFlashAttribute("message", "Exercise updated.");
         return "redirect:/manage";
     }

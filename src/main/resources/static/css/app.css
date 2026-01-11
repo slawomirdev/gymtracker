@@ -115,6 +115,11 @@ body {
     font-size: 0.75rem;
 }
 
+.gt-chip--inactive {
+    background: rgba(148, 163, 184, 0.35);
+    color: #475569;
+}
+
 .gt-footer {
     color: var(--gt-muted);
     font-size: 0.85rem;

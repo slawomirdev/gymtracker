@@ -17,7 +17,7 @@
     <div class="container">
         <a class="navbar-brand gt-brand" href="/">GymTracker</a>
         <ul class="nav nav-pills gap-2">
-            <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/">Pulpit</a></li>
             <li class="nav-item"><a class="nav-link active" href="/history">Historia</a></li>
             <li class="nav-item"><a class="nav-link" href="/stats">Statystyki</a></li>
             <li class="nav-item"><a class="nav-link" href="/manage">Zarzadzaj</a></li>
@@ -40,6 +40,11 @@
                                 th:value="${exercise.id}"
                                 th:selected="${exercise.id == selectedExerciseId}"
                                 th:text="${exercise.name}">Cwiczenie</option>
+                    </select>
+                    <select class="form-select" name="limit">
+                        <option th:value="20" th:selected="${historyLimit == 20}">Ostatnie 20 serii</option>
+                        <option th:value="50" th:selected="${historyLimit == 50}">Ostatnie 50 serii</option>
+                        <option th:value="100" th:selected="${historyLimit == 100}">Ostatnie 100 serii</option>
                     </select>
                     <button class="btn btn-gt">Pokaz historie</button>
                 </form>
@@ -78,6 +83,13 @@
                             </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div class="mt-3"
+                         th:if="${history != null && history.size() == historyLimit && historyLimit < 100}">
+                        <a class="btn btn-gt-outline btn-sm"
+                           th:href="@{'/history?exerciseId=' + ${selectedExerciseId} + '&limit=' + ${historyNextLimit}}">
+                            Pokaz wiecej
+                        </a>
                     </div>
                 </div>
             </div>

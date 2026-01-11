@@ -103,6 +103,7 @@ erDiagram
         bigint user_id FK
         varchar name
         text description
+        boolean active
         timestamp created_at
     }
     TRAINING {
@@ -139,6 +140,7 @@ classDiagram
         Long id
         String name
         String description
+        Boolean active
     }
     class Training {
         Long id

@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import pl.wsb.students.gymtracker.api.dto.TrainingCreateRequest;
 import pl.wsb.students.gymtracker.api.error.NotFoundException;
 import pl.wsb.students.gymtracker.domain.AppUser;
@@ -28,6 +30,14 @@ public class TrainingService {
     public List<Training> listTrainings() {
         AppUser user = userService.getCurrentUser();
         return trainingRepository.findAllByUserIdOrderByTrainingDateDesc(user.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Training> listTrainingsLimited(int limit) {
+        AppUser user = userService.getCurrentUser();
+        int safeLimit = Math.max(1, Math.min(limit, 50));
+        var page = PageRequest.of(0, safeLimit, Sort.by(Sort.Direction.DESC, "trainingDate"));
+        return trainingRepository.findByUserIdOrderByTrainingDateDesc(user.getId(), page).getContent();
     }
 
     @Transactional(readOnly = true)

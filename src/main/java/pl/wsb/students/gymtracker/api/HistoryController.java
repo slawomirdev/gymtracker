@@ -1,6 +1,7 @@
 package pl.wsb.students.gymtracker.api;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,8 +24,10 @@ public class HistoryController {
     }
 
     @GetMapping("/{exerciseId}/history")
-    public List<TrainingHistoryEntryResponse> history(@PathVariable Long exerciseId) {
-        List<TrainingSet> history = trainingSetService.history(exerciseId, userService.getCurrentUserId());
+    public List<TrainingHistoryEntryResponse> history(@PathVariable Long exerciseId,
+                                                      @RequestParam(defaultValue = "50") int limit) {
+        List<TrainingSet> history = trainingSetService.history(
+                exerciseId, userService.getCurrentUserId(), limit);
         return history.stream()
                 .map(set -> new TrainingHistoryEntryResponse(
                         set.getId(),

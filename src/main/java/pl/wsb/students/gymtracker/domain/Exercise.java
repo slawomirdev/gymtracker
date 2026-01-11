@@ -36,6 +36,9 @@ public class Exercise {
     @Column(columnDefinition = "text")
     private String description;
 
+    @Column(nullable = false)
+    private Boolean active;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -43,6 +46,9 @@ public class Exercise {
     void onCreate() {
         if (createdAt == null) {
             createdAt = Instant.now();
+        }
+        if (active == null) {
+            active = true;
         }
     }
 }

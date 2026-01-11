@@ -150,7 +150,7 @@ class ApiIntegrationTests {
     private record TrainingSetPayload(Long exerciseId, Integer reps, BigDecimal weight) {
     }
 
-    private record ExerciseResponse(Long id, String name, String description) {
+    private record ExerciseResponse(Long id, String name, String description, Boolean active) {
     }
 
     private record TrainingResponse(Long id, String date, String note) {

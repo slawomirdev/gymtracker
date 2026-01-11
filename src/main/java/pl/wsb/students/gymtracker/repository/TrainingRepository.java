@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import pl.wsb.students.gymtracker.domain.Training;
 
 public interface TrainingRepository extends JpaRepository<Training, Long> {
@@ -16,4 +18,7 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
     long countByUserId(Long userId);
 
     Optional<Training> findTopByUserIdOrderByTrainingDateDesc(Long userId);
+
+    @EntityGraph(attributePaths = {"sets", "sets.exercise"})
+    Page<Training> findByUserIdOrderByTrainingDateDesc(Long userId, Pageable pageable);
 }
