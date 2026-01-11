@@ -3,6 +3,29 @@
 Prosta aplikacja do planowania treningow i zapisywania serii. Backend to REST API na Spring Boot, dane trwale
 w relacyjnej bazie PostgreSQL, a UI to lekki panel oparty o Bootstrap.
 
+## Specyfikacja
+### Wymagania funkcjonalne
+1) Uzytkownik moze dodawac, edytowac i usuwac cwiczenia.
+2) Uzytkownik moze tworzyc treningi (data + notatka) i przegladac liste treningow.
+3) Uzytkownik moze dodawac i usuwac serie w ramach treningu.
+4) Uzytkownik moze przegladac historie serii dla wybranego cwiczenia.
+
+### Wymagania pozafunkcjonalne
+1) Walidacja danych wejsciowych z czytelnymi komunikatami bledow.
+2) Spójny format bledow w JSON i poprawne kody HTTP w API.
+
+### Krotki opis projektu
+GymTracker to aplikacja webowa, ktora pozwala planowac treningi i prowadzic dziennik serii,
+zapewniajac szybki podglad historii oraz statystyk progresu.
+
+### Potencjalni odbiorcy
+- Osoby trenujace silowo i amatorsko, ktore chca sledzic progres.
+- Trenerzy personalni prowadzacy podstawowy dziennik treningow podopiecznych.
+
+### Korzysci biznesowe
+- Zwiekszenie retencji uzytkownikow dzieki historii treningow i statystykom.
+- Umozliwienie analizy progresu, co wspiera sprzedaz planow i uslug treningowych.
+
 ## Wymagania
 - Java 21
 - Maven
@@ -51,13 +74,92 @@ Logowanie nie jest wymagane. UI i REST API sa dostepne bez autoryzacji.
 
 ## Przykladowe requesty
 ```bash
-curl -u demo:demo -H "Content-Type: application/json" \
+curl -H "Content-Type: application/json" \
   -d '{"name":"Przysiad","description":"Stabilizacja core"}' \
   http://localhost:8080/api/exercises
 
-curl -u demo:demo -H "Content-Type: application/json" \
+curl -H "Content-Type: application/json" \
   -d '{"date":"2025-01-10","note":"Sila + mobilnosc"}' \
   http://localhost:8080/api/trainings
+```
+
+## Stos technologiczny
+- Java 21 + Spring Boot 4
+- Spring Web MVC + Spring Data JPA
+- PostgreSQL + Flyway
+- Thymeleaf + Bootstrap
+
+## Diagram bazy danych (ER)
+```mermaid
+erDiagram
+    APP_USER {
+        bigint id PK
+        varchar username
+        varchar display_name
+        timestamp created_at
+    }
+    EXERCISE {
+        bigint id PK
+        bigint user_id FK
+        varchar name
+        text description
+        timestamp created_at
+    }
+    TRAINING {
+        bigint id PK
+        bigint user_id FK
+        date training_date
+        text note
+        timestamp created_at
+    }
+    TRAINING_SET {
+        bigint id PK
+        bigint training_id FK
+        bigint exercise_id FK
+        int reps
+        numeric weight
+        timestamp created_at
+    }
+    APP_USER ||--o{ EXERCISE : "1..n"
+    APP_USER ||--o{ TRAINING : "1..n"
+    TRAINING ||--o{ TRAINING_SET : "1..n"
+    EXERCISE ||--o{ TRAINING_SET : "1..n"
+```
+Indeksy: `idx_exercise_user`, `idx_training_user_date`, `idx_training_set_exercise`, `idx_training_set_training`.
+
+## Diagram klas (fragment)
+```mermaid
+classDiagram
+    class AppUser {
+        Long id
+        String username
+        String displayName
+    }
+    class Exercise {
+        Long id
+        String name
+        String description
+    }
+    class Training {
+        Long id
+        LocalDate trainingDate
+        String note
+    }
+    class TrainingSet {
+        Long id
+        Integer reps
+        BigDecimal weight
+    }
+    class ExerciseService
+    class TrainingService
+    class TrainingSetService
+    AppUser "1" --> "many" Exercise
+    AppUser "1" --> "many" Training
+    Training "1" --> "many" TrainingSet
+    Exercise "1" --> "many" TrainingSet
+    ExerciseService ..> Exercise
+    TrainingService ..> Training
+    TrainingSetService ..> TrainingSet
 ```
 
 ## Testy

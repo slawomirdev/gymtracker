@@ -15,10 +15,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.ClientHttpResponse;
 import pl.wsb.students.gymtracker.repository.ExerciseRepository;
 import pl.wsb.students.gymtracker.repository.TrainingRepository;
 import pl.wsb.students.gymtracker.repository.TrainingSetRepository;
+import java.io.IOException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -29,8 +32,7 @@ class ApiIntegrationTests {
     @Value("${local.server.port}")
     private int port;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private ExerciseRepository exerciseRepository;
@@ -46,6 +48,12 @@ class ApiIntegrationTests {
         trainingSetRepository.deleteAll();
         trainingRepository.deleteAll();
         exerciseRepository.deleteAll();
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler() {
+            @Override
+            public boolean hasError(ClientHttpResponse response) throws IOException {
+                return false;
+            }
+        });
     }
 
     @Test
@@ -99,7 +107,7 @@ class ApiIntegrationTests {
         assertThat(history.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(history.getBody()).isNotNull();
         assertThat(history.getBody().get(0).reps()).isEqualTo(8);
-        assertThat(history.getBody().get(0).weight()).isEqualTo(new BigDecimal("80"));
+        assertThat(history.getBody().get(0).weight().compareTo(new BigDecimal("80"))).isZero();
     }
 
     @Test
@@ -154,7 +162,7 @@ class ApiIntegrationTests {
     private record TrainingHistoryEntryResponse(Long setId, String trainingDate, Integer reps, BigDecimal weight) {
     }
 
-    private record ApiErrorResponse(String code, String message, List<FieldError> details) {
+    private record ApiErrorResponse(String code, String message, String timestamp, List<FieldError> details) {
     }
 
     private record FieldError(String field, String message) {
