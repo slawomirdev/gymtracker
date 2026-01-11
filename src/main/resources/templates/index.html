@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GymTracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg gt-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand gt-brand" href="/">GymTracker</a>
+        <span class="gt-pill">Plan. Train. Track.</span>
+    </div>
+</nav>
+
+<main class="container gt-hero">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <div class="gt-hero-card gt-card p-4 p-lg-5">
+                <h1 class="display-6 fw-bold mb-3">Twoj plan treningowy w jednym miejscu</h1>
+                <p class="lead text-muted mb-4">
+                    Szybko dodawaj treningi, zapisuj serie i analizuj progres. Wszystko w lekkim, czytelnym widoku.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <button class="btn btn-gt btn-lg">Startuj trening</button>
+                    <button class="btn btn-gt-outline btn-lg">Dodaj cwiczenie</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="gt-card p-4">
+                <h5 class="gt-section-title mb-3">Szybkie dodawanie</h5>
+                <form class="row g-3" method="post" action="/ui/trainings">
+                    <div class="col-6">
+                        <label class="form-label">Data treningu</label>
+                        <input class="form-control" type="date" name="date" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Notatka</label>
+                        <input class="form-control" type="text" name="note" placeholder="np. sila + mobilnosc">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-gt w-100">Dodaj trening</button>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <form class="row g-3" method="post" action="/ui/exercises">
+                    <div class="col-12">
+                        <label class="form-label">Nowe cwiczenie</label>
+                        <input class="form-control" type="text" name="name" placeholder="np. Martwy ciag" required>
+                    </div>
+                    <div class="col-12">
+                        <input class="form-control" type="text" name="description"
+                               placeholder="opis lub wskazowka techniczna">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-gt-outline w-100">Dodaj cwiczenie</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-lg-5">
+            <div class="gt-card p-4 h-100">
+                <h5 class="gt-section-title mb-3">Twoje cwiczenia</h5>
+                <div th:if="${#lists.isEmpty(exercises)}" class="text-muted">Brak cwiczen. Dodaj pierwsze powyzej.</div>
+                <div th:each="exercise : ${exercises}" class="gt-list-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-semibold" th:text="${exercise.name}">Nazwa</div>
+                            <small class="text-muted" th:text="${exercise.description}">Opis</small>
+                        </div>
+                        <span class="gt-chip">aktywny</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="gt-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="gt-section-title mb-0">Historia treningow</h5>
+                    <span class="gt-pill">ostatnie sesje</span>
+                </div>
+                <div th:if="${#lists.isEmpty(trainings)}" class="text-muted">
+                    Brak treningow. Dodaj pierwszy w panelu powyzej.
+                </div>
+                <div th:each="training : ${trainings}" class="gt-card gt-card-muted p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div class="fw-semibold" th:text="${training.trainingDate}">2025-01-10</div>
+                            <small class="text-muted" th:text="${training.note}">Notatka</small>
+                        </div>
+                        <span class="gt-chip" th:text="${training.sets.size()} + ' serii'">0 serii</span>
+                    </div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Cwiczenie</th>
+                                <th>Powtorzenia</th>
+                                <th>Ciezar (kg)</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(training.sets)}">
+                                <td colspan="4" class="text-muted">Brak serii. Dodaj ponizej.</td>
+                            </tr>
+                            <tr th:each="set : ${training.sets}">
+                                <td th:text="${set.exercise.name}">Przysiad</td>
+                                <td th:text="${set.reps}">8</td>
+                                <td th:text="${set.weight}">80</td>
+                                <td class="text-end">
+                                    <form method="post"
+                                          th:action="@{'/ui/trainings/' + ${training.id} + '/sets/' + ${set.id} + '/delete'}">
+                                        <button class="btn btn-sm btn-outline-danger">Usun</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <form class="row g-2" method="post" th:action="@{'/ui/trainings/' + ${training.id} + '/sets'}">
+                        <div class="col-md-5">
+                            <select class="form-select" name="exerciseId" required>
+                                <option value="">Wybierz cwiczenie</option>
+                                <option th:each="exercise : ${exercises}"
+                                        th:value="${exercise.id}"
+                                        th:text="${exercise.name}">Cwiczenie</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input class="form-control" type="number" name="reps" placeholder="Powtorzenia" min="1"
+                                   required>
+                        </div>
+                        <div class="col-md-3">
+                            <input class="form-control" type="number" name="weight" placeholder="Ciezar" min="0"
+                                   step="0.5" required>
+                        </div>
+                        <div class="col-md-1 d-grid">
+                            <button class="btn btn-gt">+</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="gt-footer text-center mt-5 mb-4">
+        GymTracker · solidny zapis treningow i szybki podglad postepow.
+    </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+</html>

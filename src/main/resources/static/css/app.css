@@ -1,0 +1,118 @@
+:root {
+    --gt-ink: #1f2933;
+    --gt-muted: #5b6776;
+    --gt-primary: #0f766e;
+    --gt-primary-dark: #115e59;
+    --gt-accent: #f59e0b;
+    --gt-surface: #ffffff;
+    --gt-surface-muted: #f3f5f7;
+    --gt-border: #e5e7eb;
+    --gt-bg: #f7f4ef;
+}
+
+body {
+    font-family: "Poppins", system-ui, sans-serif;
+    color: var(--gt-ink);
+    background: radial-gradient(circle at top left, #fef3c7, transparent 45%),
+        radial-gradient(circle at 20% 30%, #ccfbf1, transparent 40%),
+        var(--gt-bg);
+    min-height: 100vh;
+}
+
+.gt-navbar {
+    background: rgba(255, 255, 255, 0.88);
+    border-bottom: 1px solid var(--gt-border);
+    backdrop-filter: blur(12px);
+}
+
+.gt-brand {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--gt-primary-dark);
+}
+
+.gt-hero {
+    padding: 3.5rem 0 2.5rem;
+}
+
+.gt-hero-card {
+    background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(245, 158, 11, 0.15));
+    border: 1px solid rgba(15, 118, 110, 0.2);
+}
+
+.gt-section-title {
+    font-weight: 600;
+    color: var(--gt-primary-dark);
+}
+
+.gt-card {
+    border: 1px solid var(--gt-border);
+    border-radius: 1.25rem;
+    box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+    background: var(--gt-surface);
+}
+
+.gt-card-muted {
+    background: var(--gt-surface-muted);
+}
+
+.gt-pill {
+    background: rgba(15, 118, 110, 0.12);
+    color: var(--gt-primary-dark);
+    font-size: 0.85rem;
+    border-radius: 999px;
+    padding: 0.25rem 0.85rem;
+}
+
+.btn-gt {
+    background: var(--gt-primary);
+    border-color: var(--gt-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-gt:hover {
+    background: var(--gt-primary-dark);
+    border-color: var(--gt-primary-dark);
+    color: #fff;
+}
+
+.btn-gt-outline {
+    border-color: var(--gt-primary);
+    color: var(--gt-primary-dark);
+    font-weight: 600;
+}
+
+.btn-gt-outline:hover {
+    background: rgba(15, 118, 110, 0.08);
+    border-color: var(--gt-primary-dark);
+    color: var(--gt-primary-dark);
+}
+
+.gt-list-item {
+    border-bottom: 1px dashed var(--gt-border);
+    padding: 0.85rem 0;
+}
+
+.gt-list-item:last-child {
+    border-bottom: 0;
+}
+
+.gt-chip {
+    background: rgba(245, 158, 11, 0.18);
+    color: #7c4a03;
+    border-radius: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+}
+
+.gt-footer {
+    color: var(--gt-muted);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 992px) {
+    .gt-hero {
+        padding: 2.5rem 0 1.5rem;
+    }
+}
