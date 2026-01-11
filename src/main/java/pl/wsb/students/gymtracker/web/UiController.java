@@ -84,7 +84,7 @@ public class UiController {
                               @RequestParam(defaultValue = "false") boolean active,
                               RedirectAttributes redirectAttributes) {
         exerciseService.createExercise(new ExerciseRequest(name, description, active));
-        redirectAttributes.addFlashAttribute("message", "Exercise added.");
+        redirectAttributes.addFlashAttribute("message", "Cwiczenie dodane.");
         return "redirect:/";
     }
 
@@ -93,7 +93,7 @@ public class UiController {
                               @RequestParam(required = false) String note,
                               RedirectAttributes redirectAttributes) {
         trainingService.createTraining(new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
-        redirectAttributes.addFlashAttribute("message", "Training added.");
+        redirectAttributes.addFlashAttribute("message", "Trening dodany.");
         return "redirect:/";
     }
 
@@ -104,14 +104,14 @@ public class UiController {
                                  @RequestParam(defaultValue = "false") boolean active,
                                  RedirectAttributes redirectAttributes) {
         exerciseService.updateExercise(id, new ExerciseRequest(name, description, active));
-        redirectAttributes.addFlashAttribute("message", "Exercise updated.");
+        redirectAttributes.addFlashAttribute("message", "Cwiczenie zaktualizowane.");
         return "redirect:/manage";
     }
 
     @PostMapping("/ui/exercises/{id}/delete")
     public String deleteExercise(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         exerciseService.deleteExercise(id);
-        redirectAttributes.addFlashAttribute("message", "Exercise deleted.");
+        redirectAttributes.addFlashAttribute("message", "Cwiczenie usuniete.");
         return "redirect:/manage";
     }
 
@@ -121,14 +121,14 @@ public class UiController {
                                  @RequestParam(required = false) String note,
                                  RedirectAttributes redirectAttributes) {
         trainingService.updateTraining(id, new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
-        redirectAttributes.addFlashAttribute("message", "Training updated.");
+        redirectAttributes.addFlashAttribute("message", "Trening zaktualizowany.");
         return "redirect:/manage";
     }
 
     @PostMapping("/ui/trainings/{id}/delete")
     public String deleteTraining(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         trainingService.deleteTraining(id);
-        redirectAttributes.addFlashAttribute("message", "Training deleted.");
+        redirectAttributes.addFlashAttribute("message", "Trening usuniety.");
         return "redirect:/manage";
     }
 
@@ -139,7 +139,7 @@ public class UiController {
                          @RequestParam BigDecimal weight,
                          RedirectAttributes redirectAttributes) {
         trainingSetService.addSet(trainingId, new TrainingSetRequest(exerciseId, reps, weight));
-        redirectAttributes.addFlashAttribute("message", "Set added.");
+        redirectAttributes.addFlashAttribute("message", "Seria dodana.");
         return "redirect:/";
     }
 
@@ -148,7 +148,7 @@ public class UiController {
                             @PathVariable Long setId,
                             RedirectAttributes redirectAttributes) {
         trainingSetService.deleteSet(trainingId, setId, userService.getCurrentUserId());
-        redirectAttributes.addFlashAttribute("message", "Set deleted.");
+        redirectAttributes.addFlashAttribute("message", "Seria usunieta.");
         return "redirect:/";
     }
 }

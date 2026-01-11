@@ -12,7 +12,8 @@ w relacyjnej bazie PostgreSQL, a UI to lekki panel oparty o Bootstrap.
 
 ### Wymagania pozafunkcjonalne
 1) Walidacja danych wejsciowych z czytelnymi komunikatami bledow.
-2) Spójny format bledow w JSON i poprawne kody HTTP w API.
+2) Spojny format bledow w JSON i poprawne kody HTTP w API.
+3) Projekt zawiera testy automatyczne uruchamiane komenda ./mvnw test.
 
 ### Krotki opis projektu
 GymTracker to aplikacja webowa, ktora pozwala planowac treningi i prowadzic dziennik serii,
@@ -41,10 +42,13 @@ create database gymtracker;
 ```bash
 ./mvnw spring-boot:run
 ```
+Po uruchomieniu aplikacji migracje Flyway utworza tabele w bazie automatycznie.
 4) Otworz UI: `http://localhost:8080`
 
 ## Uwierzytelnianie
 Logowanie nie jest wymagane. UI i REST API sa dostepne bez autoryzacji.
+W bazie danych istnieje uzytkownik techniczny (demo), do ktorego przypisywane sa dane.
+Spring Security jest uzyte w projekcie, ale konfiguracja dopuszcza dostep publiczny (permitAll) do UI i API.
 
 ## Glowne endpointy REST
 - `GET /api/exercises` - lista cwiczen
@@ -84,7 +88,7 @@ curl -H "Content-Type: application/json" \
 ```
 
 ## Stos technologiczny
-- Java 21 + Spring Boot 4
+- Java 21 + Spring Boot 3.3.2
 - Spring Web MVC + Spring Data JPA
 - PostgreSQL + Flyway
 - Thymeleaf + Bootstrap
@@ -128,6 +132,13 @@ erDiagram
 ```
 Indeksy: `idx_exercise_user`, `idx_training_user_date`, `idx_training_set_exercise`, `idx_training_set_training`.
 
+### Struktura bazy danych (opis)
+- APP_USER: PK(id)
+- EXERCISE: PK(id), FK(user_id -> app_user.id), indeks idx_exercise_user(user_id)
+- TRAINING: PK(id), FK(user_id -> app_user.id), indeks idx_training_user_date(user_id, training_date)
+- TRAINING_SET: PK(id), FK(training_id -> training.id), FK(exercise_id -> exercise.id),
+  indeksy idx_training_set_training(training_id), idx_training_set_exercise(exercise_id)
+
 ## Diagram klas (fragment)
 ```mermaid
 classDiagram
@@ -165,6 +176,12 @@ classDiagram
 ```
 
 ## Testy
+Projekt zawiera minimum 4 testy automatyczne:
+- `src/test/java/pl/wsb/students/gymtracker/service/ExerciseServiceTest.java`
+- `src/test/java/pl/wsb/students/gymtracker/service/TrainingServiceTest.java`
+- `src/test/java/pl/wsb/students/gymtracker/service/TrainingSetServiceTest.java`
+- `src/test/java/pl/wsb/students/gymtracker/service/StatsServiceTest.java`
+
 ```bash
 ./mvnw test
 ```
