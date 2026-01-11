@@ -32,9 +32,22 @@ Logowanie nie jest wymagane. UI i REST API sa dostepne bez autoryzacji.
 - `POST /api/trainings` - utworzenie treningu
 - `GET /api/trainings` - lista treningow
 - `GET /api/trainings/{id}` - szczegoly treningu z seriami
+- `PUT /api/trainings/{id}` - aktualizacja treningu (data, notatka)
 - `POST /api/trainings/{id}/sets` - dodanie serii do treningu
 - `DELETE /api/trainings/{trainingId}/sets/{setId}` - usuniecie serii
 - `GET /api/exercises/{id}/history` - historia serii dla cwiczenia
+- `GET /api/stats/summary` - podsumowanie statystyk
+- `GET /api/stats/exercises` - statystyki per cwiczenie
+
+## Swagger / OpenAPI
+- UI: `http://localhost:8080/swagger-ui/index.html`
+- Specyfikacja JSON: `http://localhost:8080/v3/api-docs`
+
+## Widoki UI
+- `/` - dashboard (dodawanie, lista treningow i serii)
+- `/history` - historia serii dla wybranego cwiczenia
+- `/stats` - podsumowanie i statystyki cwiczen
+- `/manage` - edycja i usuwanie cwiczen oraz treningow
 
 ## Przykladowe requesty
 ```bash

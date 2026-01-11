@@ -6,30 +6,47 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
-import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import pl.wsb.students.gymtracker.repository.ExerciseRepository;
+import pl.wsb.students.gymtracker.repository.TrainingRepository;
+import pl.wsb.students.gymtracker.repository.TrainingSetRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Transactional
 class ApiIntegrationTests {
 
-    @Autowired
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @LocalServerPort
+    @Value("${local.server.port}")
     private int port;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private ExerciseRepository exerciseRepository;
+
+    @Autowired
+    private TrainingRepository trainingRepository;
+
+    @Autowired
+    private TrainingSetRepository trainingSetRepository;
+
+    @BeforeEach
+    void resetData() {
+        trainingSetRepository.deleteAll();
+        trainingRepository.deleteAll();
+        exerciseRepository.deleteAll();
+    }
 
     @Test
     void createsAndListsExercise() throws Exception {

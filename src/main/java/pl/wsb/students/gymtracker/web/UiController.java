@@ -12,6 +12,7 @@ import pl.wsb.students.gymtracker.api.dto.ExerciseRequest;
 import pl.wsb.students.gymtracker.api.dto.TrainingCreateRequest;
 import pl.wsb.students.gymtracker.api.dto.TrainingSetRequest;
 import pl.wsb.students.gymtracker.service.ExerciseService;
+import pl.wsb.students.gymtracker.service.StatsService;
 import pl.wsb.students.gymtracker.service.TrainingService;
 import pl.wsb.students.gymtracker.service.TrainingSetService;
 import pl.wsb.students.gymtracker.service.UserService;
@@ -23,15 +24,18 @@ public class UiController {
     private final TrainingService trainingService;
     private final TrainingSetService trainingSetService;
     private final UserService userService;
+    private final StatsService statsService;
 
     public UiController(ExerciseService exerciseService,
                         TrainingService trainingService,
                         TrainingSetService trainingSetService,
-                        UserService userService) {
+                        UserService userService,
+                        StatsService statsService) {
         this.exerciseService = exerciseService;
         this.trainingService = trainingService;
         this.trainingSetService = trainingSetService;
         this.userService = userService;
+        this.statsService = statsService;
     }
 
     @GetMapping("/")
@@ -39,6 +43,30 @@ public class UiController {
         model.addAttribute("exercises", exerciseService.listExercises());
         model.addAttribute("trainings", trainingService.listTrainings());
         return "index";
+    }
+
+    @GetMapping("/history")
+    public String history(@RequestParam(required = false) Long exerciseId, Model model) {
+        model.addAttribute("exercises", exerciseService.listExercises());
+        model.addAttribute("selectedExerciseId", exerciseId);
+        if (exerciseId != null) {
+            model.addAttribute("history", trainingSetService.history(exerciseId, userService.getCurrentUserId()));
+        }
+        return "history";
+    }
+
+    @GetMapping("/stats")
+    public String stats(Model model) {
+        model.addAttribute("summary", statsService.summary());
+        model.addAttribute("exerciseStats", statsService.exerciseStats());
+        return "stats";
+    }
+
+    @GetMapping("/manage")
+    public String manage(Model model) {
+        model.addAttribute("exercises", exerciseService.listExercises());
+        model.addAttribute("trainings", trainingService.listTrainings());
+        return "manage";
     }
 
     @PostMapping("/ui/exercises")
@@ -57,6 +85,40 @@ public class UiController {
         trainingService.createTraining(new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
         redirectAttributes.addFlashAttribute("message", "Training added.");
         return "redirect:/";
+    }
+
+    @PostMapping("/ui/exercises/{id}/update")
+    public String updateExercise(@PathVariable Long id,
+                                 @RequestParam String name,
+                                 @RequestParam(required = false) String description,
+                                 RedirectAttributes redirectAttributes) {
+        exerciseService.updateExercise(id, new ExerciseRequest(name, description));
+        redirectAttributes.addFlashAttribute("message", "Exercise updated.");
+        return "redirect:/manage";
+    }
+
+    @PostMapping("/ui/exercises/{id}/delete")
+    public String deleteExercise(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        exerciseService.deleteExercise(id);
+        redirectAttributes.addFlashAttribute("message", "Exercise deleted.");
+        return "redirect:/manage";
+    }
+
+    @PostMapping("/ui/trainings/{id}/update")
+    public String updateTraining(@PathVariable Long id,
+                                 @RequestParam String date,
+                                 @RequestParam(required = false) String note,
+                                 RedirectAttributes redirectAttributes) {
+        trainingService.updateTraining(id, new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
+        redirectAttributes.addFlashAttribute("message", "Training updated.");
+        return "redirect:/manage";
+    }
+
+    @PostMapping("/ui/trainings/{id}/delete")
+    public String deleteTraining(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        trainingService.deleteTraining(id);
+        redirectAttributes.addFlashAttribute("message", "Training deleted.");
+        return "redirect:/manage";
     }
 
     @PostMapping("/ui/trainings/{trainingId}/sets")

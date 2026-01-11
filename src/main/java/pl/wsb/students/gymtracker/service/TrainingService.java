@@ -48,4 +48,19 @@ public class TrainingService {
         logger.info("Created training {} for user {}", saved.getId(), user.getId());
         return saved;
     }
+
+    @Transactional
+    public Training updateTraining(Long id, TrainingCreateRequest request) {
+        Training training = getTraining(id);
+        training.setTrainingDate(request.date());
+        training.setNote(request.note());
+        return trainingRepository.save(training);
+    }
+
+    @Transactional
+    public void deleteTraining(Long id) {
+        Training training = getTraining(id);
+        trainingRepository.delete(training);
+        logger.info("Deleted training {}", id);
+    }
 }

@@ -12,4 +12,8 @@ public interface TrainingRepository extends JpaRepository<Training, Long> {
 
     @EntityGraph(attributePaths = {"sets", "sets.exercise"})
     Optional<Training> findByIdAndUserId(Long id, Long userId);
+
+    long countByUserId(Long userId);
+
+    Optional<Training> findTopByUserIdOrderByTrainingDateDesc(Long userId);
 }

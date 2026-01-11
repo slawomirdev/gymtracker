@@ -6,4 +6,6 @@ import pl.wsb.students.gymtracker.domain.Exercise;
 
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     List<Exercise> findAllByUserIdOrderByNameAsc(Long userId);
+
+    long countByUserId(Long userId);
 }

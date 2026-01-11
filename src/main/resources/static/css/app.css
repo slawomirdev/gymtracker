@@ -25,6 +25,15 @@ body {
     backdrop-filter: blur(12px);
 }
 
+.nav-pills .nav-link {
+    color: var(--gt-primary-dark);
+    font-weight: 600;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--gt-primary);
+}
+
 .gt-brand {
     font-weight: 700;
     letter-spacing: 0.3px;

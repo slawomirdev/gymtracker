@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GymTracker - Statystyki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg gt-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand gt-brand" href="/">GymTracker</a>
+        <ul class="nav nav-pills gap-2">
+            <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="/history">Historia</a></li>
+            <li class="nav-item"><a class="nav-link active" href="/stats">Statystyki</a></li>
+            <li class="nav-item"><a class="nav-link" href="/manage">Zarzadzaj</a></li>
+        </ul>
+        <span class="gt-pill d-none d-lg-inline">Analiza progresu</span>
+    </div>
+</nav>
+
+<main class="container gt-hero">
+    <div th:if="${message}" class="alert alert-success mt-3" th:text="${message}">Status</div>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="gt-card p-4">
+                <h5 class="gt-section-title mb-3">Podsumowanie</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="gt-card gt-card-muted p-3 text-center">
+                            <div class="text-muted">Treningi</div>
+                            <div class="fs-3 fw-semibold" th:text="${summary.totalTrainings}">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="gt-card gt-card-muted p-3 text-center">
+                            <div class="text-muted">Serie</div>
+                            <div class="fs-3 fw-semibold" th:text="${summary.totalSets}">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="gt-card gt-card-muted p-3 text-center">
+                            <div class="text-muted">Cwiczenia</div>
+                            <div class="fs-3 fw-semibold" th:text="${summary.totalExercises}">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="gt-card gt-card-muted p-3 text-center">
+                            <div class="text-muted">Objetosc (kg)</div>
+                            <div class="fs-3 fw-semibold" th:text="${summary.totalVolume}">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 text-muted">
+                    Ostatni trening:
+                    <span th:text="${summary.lastTrainingDate != null ? summary.lastTrainingDate : 'brak'}">brak</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="gt-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="gt-section-title mb-0">Statystyki cwiczen</h5>
+                    <span class="gt-pill">sila + objetosc</span>
+                </div>
+                <div th:if="${exerciseStats == null || #lists.isEmpty(exerciseStats)}" class="text-muted">
+                    Brak danych. Dodaj serie do treningow.
+                </div>
+                <div th:if="${exerciseStats != null && !#lists.isEmpty(exerciseStats)}" class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                        <tr>
+                            <th>Cwiczenie</th>
+                            <th>Serie</th>
+                            <th>Max ciezar</th>
+                            <th>Objetosc</th>
+                            <th>Ostatni trening</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="row : ${exerciseStats}">
+                            <td th:text="${row.exerciseName}">Przysiad</td>
+                            <td th:text="${row.totalSets}">0</td>
+                            <td th:text="${row.maxWeight}">0</td>
+                            <td th:text="${row.totalVolume}">0</td>
+                            <td th:text="${row.lastTrainingDate}">brak</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
