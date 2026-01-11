@@ -34,12 +34,18 @@ class ExerciseServiceTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(exerciseRepository.save(any(Exercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ExerciseRequest request = new ExerciseRequest("Wyciskanie", "Sila klatki", true);
+        ExerciseRequest request = new ExerciseRequest(
+                "Wyciskanie",
+                "Sila klatki",
+                "https://example.com/wyciskanie.jpg",
+                true
+        );
         Exercise saved = exerciseService.createExercise(request);
 
         assertThat(saved.getUser()).isEqualTo(user);
         assertThat(saved.getName()).isEqualTo("Wyciskanie");
         assertThat(saved.getDescription()).isEqualTo("Sila klatki");
+        assertThat(saved.getImageUrl()).isEqualTo("https://example.com/wyciskanie.jpg");
         verify(exerciseRepository).save(any(Exercise.class));
     }
 }

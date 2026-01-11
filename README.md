@@ -107,6 +107,7 @@ erDiagram
         bigint user_id FK
         varchar name
         text description
+        varchar image_url
         boolean active
         timestamp created_at
     }
@@ -115,6 +116,10 @@ erDiagram
         bigint user_id FK
         date training_date
         text note
+        varchar intensity
+        varchar location
+        numeric body_weight
+        int duration_minutes
         timestamp created_at
     }
     TRAINING_SET {
@@ -151,12 +156,17 @@ classDiagram
         Long id
         String name
         String description
+        String imageUrl
         Boolean active
     }
     class Training {
         Long id
         LocalDate trainingDate
         String note
+        String intensity
+        String location
+        BigDecimal bodyWeight
+        Integer durationMinutes
     }
     class TrainingSet {
         Long id

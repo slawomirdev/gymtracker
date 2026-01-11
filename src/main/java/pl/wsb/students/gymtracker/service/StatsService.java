@@ -33,12 +33,20 @@ public class StatsService {
         Long userId = userService.getCurrentUserId();
         long totalTrainings = trainingRepository.countByUserId(userId);
         long totalSets = trainingSetRepository.countByTrainingUserId(userId);
+        long totalReps = trainingSetRepository.sumRepsByUserId(userId);
         long totalExercises = exerciseRepository.countByUserId(userId);
         BigDecimal totalVolume = trainingSetRepository.sumVolumeByUserId(userId);
         var lastTrainingDate = trainingRepository.findTopByUserIdOrderByTrainingDateDesc(userId)
                 .map(training -> training.getTrainingDate())
                 .orElse(null);
-        return new StatsSummaryResponse(totalTrainings, totalSets, totalExercises, totalVolume, lastTrainingDate);
+        return new StatsSummaryResponse(
+                totalTrainings,
+                totalSets,
+                totalReps,
+                totalExercises,
+                totalVolume,
+                lastTrainingDate
+        );
     }
 
     @Transactional(readOnly = true)

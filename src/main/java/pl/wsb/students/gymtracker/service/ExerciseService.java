@@ -51,6 +51,7 @@ public class ExerciseService {
         exercise.setUser(user);
         exercise.setName(request.name());
         exercise.setDescription(request.description());
+        exercise.setImageUrl(request.imageUrl());
         exercise.setActive(request.active() == null || request.active());
         Exercise saved = exerciseRepository.save(exercise);
         logger.info("Created exercise {} for user {}", saved.getId(), user.getId());
@@ -62,6 +63,7 @@ public class ExerciseService {
         Exercise exercise = getExercise(id);
         exercise.setName(request.name());
         exercise.setDescription(request.description());
+        exercise.setImageUrl(request.imageUrl());
         if (request.active() != null) {
             exercise.setActive(request.active());
         }

@@ -36,7 +36,14 @@ class TrainingServiceTest {
         when(trainingRepository.save(any(Training.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LocalDate date = LocalDate.of(2025, 1, 10);
-        TrainingCreateRequest request = new TrainingCreateRequest(date, "Sila + mobilnosc");
+        TrainingCreateRequest request = new TrainingCreateRequest(
+                date,
+                "Sila + mobilnosc",
+                "srednia",
+                "Silownia",
+                null,
+                75
+        );
         Training saved = trainingService.createTraining(request);
 
         assertThat(saved.getUser()).isEqualTo(user);

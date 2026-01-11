@@ -44,37 +44,21 @@
         <div class="col-lg-5">
             <div class="gt-card p-4">
                 <h5 class="gt-section-title mb-3">Szybkie dodawanie</h5>
-                <form class="row g-3" method="post" action="/ui/trainings">
-                    <div class="col-6">
-                        <label class="form-label">Data treningu</label>
-                        <input class="form-control" type="date" name="date" required>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label">Notatka</label>
-                        <input class="form-control" type="text" name="note" placeholder="np. sila + mobilnosc">
-                    </div>
-                    <div class="col-12">
-                        <button class="btn btn-gt w-100">Dodaj trening</button>
-                    </div>
-                </form>
-                <hr class="my-4">
-                <form class="row g-3" method="post" action="/ui/exercises">
-                    <div class="col-12">
-                        <label class="form-label">Nowe cwiczenie</label>
-                        <input class="form-control" type="text" name="name" placeholder="np. Martwy ciag" required>
-                    </div>
-                    <div class="col-12">
-                        <input class="form-control" type="text" name="description"
-                               placeholder="opis lub wskazowka techniczna">
-                    </div>
-                    <div class="col-12 form-check">
-                        <input class="form-check-input" type="checkbox" name="active" value="true" checked>
-                        <label class="form-check-label">Aktywne cwiczenie</label>
-                    </div>
-                    <div class="col-12">
-                        <button class="btn btn-gt-outline w-100">Dodaj cwiczenie</button>
-                    </div>
-                </form>
+                <p class="text-muted">Dodawaj treningi i cwiczenia bez przewijania.</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-gt" data-bs-toggle="modal" data-bs-target="#trainingModal">
+                        Dodaj trening
+                    </button>
+                    <button class="btn btn-gt-outline" data-bs-toggle="modal" data-bs-target="#exerciseModal">
+                        Dodaj cwiczenie
+                    </button>
+                    <button class="btn btn-gt-outline" data-bs-toggle="modal" data-bs-target="#bulkExerciseModal">
+                        Dodaj kilka cwiczen
+                    </button>
+                </div>
+                <div class="text-muted mt-3 small">
+                    W treningu mozesz podac intensywnosc, lokalizacje, wage ciala i czas trwania.
+                </div>
             </div>
         </div>
     </div>
@@ -113,9 +97,15 @@
                 <div th:if="${#lists.isEmpty(exercises)}" class="text-muted">Brak cwiczen. Dodaj pierwsze powyzej.</div>
                 <div th:each="exercise : ${exercises}" class="gt-list-item">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="fw-semibold" th:text="${exercise.name}">Nazwa</div>
-                            <small class="text-muted" th:text="${exercise.description}">Opis</small>
+                        <div class="d-flex align-items-center gap-3">
+                            <div th:if="${exercise.imageUrl != null && !#strings.isEmpty(exercise.imageUrl)}">
+                                <img th:src="${exercise.imageUrl}" alt="zdjecie cwiczenia"
+                                     class="gt-thumb" onerror="this.style.display='none'">
+                            </div>
+                            <div>
+                                <div class="fw-semibold" th:text="${exercise.name}">Nazwa</div>
+                                <small class="text-muted" th:text="${exercise.description}">Opis</small>
+                            </div>
                         </div>
                         <span class="gt-chip"
                               th:classappend="${exercise.active} ? '' : ' gt-chip--inactive'"
@@ -138,6 +128,16 @@
                         <div>
                             <div class="fw-semibold" th:text="${training.trainingDate}">2025-01-10</div>
                             <small class="text-muted" th:text="${training.note}">Notatka</small>
+                            <div class="mt-2 d-flex flex-wrap gap-2">
+                                <span class="gt-pill" th:if="${training.intensity != null}"
+                                      th:text="'Intensywnosc: ' + ${training.intensity}">Intensywnosc</span>
+                                <span class="gt-pill" th:if="${training.durationMinutes != null}"
+                                      th:text="'Czas: ' + ${training.durationMinutes} + ' min'">Czas</span>
+                                <span class="gt-pill" th:if="${training.location != null}"
+                                      th:text="'Lokalizacja: ' + ${training.location}">Lokalizacja</span>
+                                <span class="gt-pill" th:if="${training.bodyWeight != null}"
+                                      th:text="'Waga ciala: ' + ${training.bodyWeight} + ' kg'">Waga</span>
+                            </div>
                         </div>
                         <span class="gt-chip" th:text="${training.sets.size()} + ' serii'">0 serii</span>
                     </div>
@@ -204,6 +204,116 @@
     <footer class="gt-footer text-center mt-5 mb-4">
         GymTracker · solidny zapis treningow i szybki podglad postepow.
     </footer>
+
+    <div class="modal fade" id="trainingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj trening</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                </div>
+                <form method="post" action="/ui/trainings">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Data treningu</label>
+                                <input class="form-control" type="date" name="date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Intensywnosc</label>
+                                <select class="form-select" name="intensity">
+                                    <option value="">Brak</option>
+                                    <option value="niska">Niska</option>
+                                    <option value="srednia">Srednia</option>
+                                    <option value="wysoka">Wysoka</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notatka</label>
+                                <input class="form-control" type="text" name="note" placeholder="np. sila + mobilnosc">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Lokalizacja</label>
+                                <input class="form-control" type="text" name="location" placeholder="np. Silownia">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Waga ciala (kg)</label>
+                                <input class="form-control" type="number" name="bodyWeight" step="0.1" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Czas trwania (min)</label>
+                                <input class="form-control" type="number" name="durationMinutes" min="1">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-gt" type="submit">Dodaj trening</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exerciseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj cwiczenie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                </div>
+                <form method="post" action="/ui/exercises">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nazwa</label>
+                                <input class="form-control" type="text" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Link do zdjecia</label>
+                                <input class="form-control" type="text" name="imageUrl" placeholder="https://...">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Opis</label>
+                                <input class="form-control" type="text" name="description"
+                                       placeholder="opis lub wskazowka techniczna">
+                            </div>
+                            <div class="col-12 form-check">
+                                <input class="form-check-input" type="checkbox" name="active" value="true" checked>
+                                <label class="form-check-label">Aktywne cwiczenie</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-gt-outline" type="submit">Dodaj cwiczenie</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="bulkExerciseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dodaj kilka cwiczen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                </div>
+                <form method="post" action="/ui/exercises/bulk">
+                    <div class="modal-body">
+                        <label class="form-label">Wklej liste (format: nazwa; opis; link; aktywne)</label>
+                        <textarea class="form-control" name="bulkLines" rows="6"
+                                  placeholder="Przysiad; Stabilizacja; https://...; true"></textarea>
+                        <div class="text-muted small mt-2">
+                            Kazda linia to jedno cwiczenie. Pola po sredniku sa opcjonalne.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-gt" type="submit">Dodaj cwiczenia</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"

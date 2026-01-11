@@ -87,7 +87,16 @@ public class TrainingController {
         List<TrainingSetResponse> sets = training.getSets().stream()
                 .map(this::toSetResponse)
                 .toList();
-        return new TrainingResponse(training.getId(), training.getTrainingDate(), training.getNote(), sets);
+        return new TrainingResponse(
+                training.getId(),
+                training.getTrainingDate(),
+                training.getNote(),
+                training.getIntensity(),
+                training.getLocation(),
+                training.getBodyWeight(),
+                training.getDurationMinutes(),
+                sets
+        );
     }
 
     private TrainingSetResponse toSetResponse(TrainingSet set) {

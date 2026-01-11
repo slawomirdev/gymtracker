@@ -66,6 +66,7 @@ public class ExerciseController {
                 exercise.getId(),
                 exercise.getName(),
                 exercise.getDescription(),
+                exercise.getImageUrl(),
                 exercise.getActive()
         );
     }

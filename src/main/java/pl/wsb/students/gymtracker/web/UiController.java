@@ -1,6 +1,8 @@
 package pl.wsb.students.gymtracker.web;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,8 +68,21 @@ public class UiController {
 
     @GetMapping("/stats")
     public String stats(Model model) {
-        model.addAttribute("summary", statsService.summary());
-        model.addAttribute("exerciseStats", statsService.exerciseStats());
+        var summary = statsService.summary();
+        var exerciseStats = statsService.exerciseStats();
+        List<String> labels = new ArrayList<>();
+        List<BigDecimal> volumes = new ArrayList<>();
+        List<BigDecimal> maxWeights = new ArrayList<>();
+        for (var row : exerciseStats) {
+            labels.add(row.exerciseName());
+            volumes.add(row.totalVolume());
+            maxWeights.add(row.maxWeight());
+        }
+        model.addAttribute("summary", summary);
+        model.addAttribute("exerciseStats", exerciseStats);
+        model.addAttribute("statsLabels", labels);
+        model.addAttribute("statsVolumes", volumes);
+        model.addAttribute("statsMaxWeights", maxWeights);
         return "stats";
     }
 
@@ -81,9 +96,10 @@ public class UiController {
     @PostMapping("/ui/exercises")
     public String addExercise(@RequestParam String name,
                               @RequestParam(required = false) String description,
+                              @RequestParam(required = false) String imageUrl,
                               @RequestParam(defaultValue = "false") boolean active,
                               RedirectAttributes redirectAttributes) {
-        exerciseService.createExercise(new ExerciseRequest(name, description, active));
+        exerciseService.createExercise(new ExerciseRequest(name, description, imageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie dodane.");
         return "redirect:/";
     }
@@ -91,8 +107,19 @@ public class UiController {
     @PostMapping("/ui/trainings")
     public String addTraining(@RequestParam String date,
                               @RequestParam(required = false) String note,
+                              @RequestParam(required = false) String intensity,
+                              @RequestParam(required = false) String location,
+                              @RequestParam(required = false) String bodyWeight,
+                              @RequestParam(required = false) String durationMinutes,
                               RedirectAttributes redirectAttributes) {
-        trainingService.createTraining(new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
+        trainingService.createTraining(new TrainingCreateRequest(
+                java.time.LocalDate.parse(date),
+                note,
+                emptyToNull(intensity),
+                emptyToNull(location),
+                parseBigDecimal(bodyWeight),
+                parseInteger(durationMinutes)
+        ));
         redirectAttributes.addFlashAttribute("message", "Trening dodany.");
         return "redirect:/";
     }
@@ -101,9 +128,10 @@ public class UiController {
     public String updateExercise(@PathVariable Long id,
                                  @RequestParam String name,
                                  @RequestParam(required = false) String description,
+                                 @RequestParam(required = false) String imageUrl,
                                  @RequestParam(defaultValue = "false") boolean active,
                                  RedirectAttributes redirectAttributes) {
-        exerciseService.updateExercise(id, new ExerciseRequest(name, description, active));
+        exerciseService.updateExercise(id, new ExerciseRequest(name, description, imageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie zaktualizowane.");
         return "redirect:/manage";
     }
@@ -119,8 +147,19 @@ public class UiController {
     public String updateTraining(@PathVariable Long id,
                                  @RequestParam String date,
                                  @RequestParam(required = false) String note,
+                                 @RequestParam(required = false) String intensity,
+                                 @RequestParam(required = false) String location,
+                                 @RequestParam(required = false) String bodyWeight,
+                                 @RequestParam(required = false) String durationMinutes,
                                  RedirectAttributes redirectAttributes) {
-        trainingService.updateTraining(id, new TrainingCreateRequest(java.time.LocalDate.parse(date), note));
+        trainingService.updateTraining(id, new TrainingCreateRequest(
+                java.time.LocalDate.parse(date),
+                note,
+                emptyToNull(intensity),
+                emptyToNull(location),
+                parseBigDecimal(bodyWeight),
+                parseInteger(durationMinutes)
+        ));
         redirectAttributes.addFlashAttribute("message", "Trening zaktualizowany.");
         return "redirect:/manage";
     }
@@ -150,5 +189,59 @@ public class UiController {
         trainingSetService.deleteSet(trainingId, setId, userService.getCurrentUserId());
         redirectAttributes.addFlashAttribute("message", "Seria usunieta.");
         return "redirect:/";
+    }
+
+    @PostMapping("/ui/exercises/bulk")
+    public String addExercisesBulk(@RequestParam String bulkLines, RedirectAttributes redirectAttributes) {
+        String[] lines = bulkLines.split("\\r?\\n");
+        int added = 0;
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            String[] parts = trimmed.split(";", -1);
+            String name = parts[0].trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            String description = parts.length > 1 ? emptyToNull(parts[1]) : null;
+            String imageUrl = parts.length > 2 ? emptyToNull(parts[2]) : null;
+            Boolean active = parts.length > 3 ? parseBoolean(parts[3]) : true;
+            exerciseService.createExercise(new ExerciseRequest(name, description, imageUrl, active));
+            added++;
+        }
+        redirectAttributes.addFlashAttribute("message", "Dodano cwiczenia: " + added + ".");
+        return "redirect:/manage";
+    }
+
+    private java.math.BigDecimal parseBigDecimal(String raw) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return null;
+        }
+        return new java.math.BigDecimal(raw.replace(",", ".").trim());
+    }
+
+    private Integer parseInteger(String raw) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return null;
+        }
+        return Integer.valueOf(raw.trim());
+    }
+
+    private String emptyToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private boolean parseBoolean(String raw) {
+        if (raw == null) {
+            return true;
+        }
+        String value = raw.trim().toLowerCase();
+        return !(value.equals("false") || value.equals("0") || value.equals("nie"));
     }
 }

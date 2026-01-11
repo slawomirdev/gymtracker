@@ -54,6 +54,10 @@ public class TrainingService {
         training.setUser(user);
         training.setTrainingDate(request.date());
         training.setNote(request.note());
+        training.setIntensity(request.intensity());
+        training.setLocation(request.location());
+        training.setBodyWeight(request.bodyWeight());
+        training.setDurationMinutes(request.durationMinutes());
         Training saved = trainingRepository.save(training);
         logger.info("Created training {} for user {}", saved.getId(), user.getId());
         return saved;
@@ -64,6 +68,10 @@ public class TrainingService {
         Training training = getTraining(id);
         training.setTrainingDate(request.date());
         training.setNote(request.note());
+        training.setIntensity(request.intensity());
+        training.setLocation(request.location());
+        training.setBodyWeight(request.bodyWeight());
+        training.setDurationMinutes(request.durationMinutes());
         return trainingRepository.save(training);
     }
 

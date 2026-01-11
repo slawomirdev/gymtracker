@@ -150,10 +150,11 @@ class ApiIntegrationTests {
     private record TrainingSetPayload(Long exerciseId, Integer reps, BigDecimal weight) {
     }
 
-    private record ExerciseResponse(Long id, String name, String description, Boolean active) {
+    private record ExerciseResponse(Long id, String name, String description, String imageUrl, Boolean active) {
     }
 
-    private record TrainingResponse(Long id, String date, String note) {
+    private record TrainingResponse(Long id, String date, String note, String intensity, String location,
+                                   String bodyWeight, Integer durationMinutes, List<TrainingSetResponse> sets) {
     }
 
     private record TrainingSetResponse(Long id, Long exerciseId, String exerciseName, Integer reps, BigDecimal weight) {

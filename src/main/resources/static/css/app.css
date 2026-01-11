@@ -120,6 +120,15 @@ body {
     color: #475569;
 }
 
+.gt-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid var(--gt-border);
+    background: #fff;
+}
+
 .gt-footer {
     color: var(--gt-muted);
     font-size: 0.85rem;

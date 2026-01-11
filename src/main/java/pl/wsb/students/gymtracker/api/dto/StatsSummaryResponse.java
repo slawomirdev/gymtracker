@@ -6,6 +6,7 @@ import java.time.LocalDate;
 public record StatsSummaryResponse(
         long totalTrainings,
         long totalSets,
+        long totalReps,
         long totalExercises,
         BigDecimal totalVolume,
         LocalDate lastTrainingDate

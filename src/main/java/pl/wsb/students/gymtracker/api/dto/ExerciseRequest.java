@@ -9,6 +9,8 @@ public record ExerciseRequest(
         String name,
         @Size(max = 500, message = "Description must be at most 500 characters")
         String description,
+        @Size(max = 300, message = "Image URL must be at most 300 characters")
+        String imageUrl,
         Boolean active
 ) {
 }

@@ -36,6 +36,9 @@ public class Exercise {
     @Column(columnDefinition = "text")
     private String description;
 
+    @Column(name = "image_url", length = 300)
+    private String imageUrl;
+
     @Column(nullable = false)
     private Boolean active;
 

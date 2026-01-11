@@ -52,13 +52,17 @@
                             <td>
                                 <form th:action="@{'/ui/exercises/' + ${exercise.id} + '/update'}" method="post"
                                       class="row g-2 align-items-center">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <input class="form-control form-control-sm" type="text" name="name"
                                                th:value="${exercise.name}" required>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <input class="form-control form-control-sm" type="text" name="description"
                                                th:value="${exercise.description}">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input class="form-control form-control-sm" type="text" name="imageUrl"
+                                               th:value="${exercise.imageUrl}" placeholder="Link do zdjecia">
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-check">
@@ -96,7 +100,7 @@
                     <table class="table table-sm align-middle">
                         <thead>
                         <tr>
-                            <th>Data i notatka</th>
+                            <th>Szczegoly treningu</th>
                             <th>Serie</th>
                             <th class="text-end">Akcje</th>
                         </tr>
@@ -106,15 +110,35 @@
                             <td>
                                 <form th:action="@{'/ui/trainings/' + ${training.id} + '/update'}" method="post"
                                       class="row g-2">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <input class="form-control form-control-sm" type="date" name="date"
                                                th:value="${training.trainingDate}" required>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <input class="form-control form-control-sm" type="text" name="note"
-                                               th:value="${training.note}">
+                                               th:value="${training.note}" placeholder="Notatka">
                                     </div>
-                                    <div class="col-md-2 d-grid">
+                                    <div class="col-md-2">
+                                        <select class="form-select form-select-sm" name="intensity">
+                                            <option value="">Intensywnosc</option>
+                                            <option value="niska" th:selected="${training.intensity == 'niska'}">Niska</option>
+                                            <option value="srednia" th:selected="${training.intensity == 'srednia'}">Srednia</option>
+                                            <option value="wysoka" th:selected="${training.intensity == 'wysoka'}">Wysoka</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input class="form-control form-control-sm" type="text" name="location"
+                                               th:value="${training.location}" placeholder="Lokalizacja">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input class="form-control form-control-sm" type="number" name="bodyWeight"
+                                               th:value="${training.bodyWeight}" placeholder="Waga" step="0.1" min="0">
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input class="form-control form-control-sm" type="number" name="durationMinutes"
+                                               th:value="${training.durationMinutes}" placeholder="Min" min="1">
+                                    </div>
+                                    <div class="col-md-12 col-lg-2 d-grid">
                                         <button class="btn btn-sm btn-gt" type="submit">Zapisz</button>
                                     </div>
                                 </form>

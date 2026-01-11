@@ -42,6 +42,18 @@ public class Training {
     @Column(columnDefinition = "text")
     private String note;
 
+    @Column(length = 20)
+    private String intensity;
+
+    @Column(length = 120)
+    private String location;
+
+    @Column(name = "body_weight", precision = 5, scale = 2)
+    private java.math.BigDecimal bodyWeight;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

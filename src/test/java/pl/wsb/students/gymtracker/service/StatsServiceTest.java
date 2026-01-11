@@ -41,6 +41,7 @@ class StatsServiceTest {
         when(userService.getCurrentUserId()).thenReturn(userId);
         when(trainingRepository.countByUserId(userId)).thenReturn(4L);
         when(trainingSetRepository.countByTrainingUserId(userId)).thenReturn(18L);
+        when(trainingSetRepository.sumRepsByUserId(userId)).thenReturn(120L);
         when(exerciseRepository.countByUserId(userId)).thenReturn(6L);
         when(trainingSetRepository.sumVolumeByUserId(userId)).thenReturn(new BigDecimal("2500"));
         Training latest = new Training();
@@ -51,6 +52,7 @@ class StatsServiceTest {
 
         assertThat(response.totalTrainings()).isEqualTo(4L);
         assertThat(response.totalSets()).isEqualTo(18L);
+        assertThat(response.totalReps()).isEqualTo(120L);
         assertThat(response.totalExercises()).isEqualTo(6L);
         assertThat(response.totalVolume()).isEqualTo(new BigDecimal("2500"));
         assertThat(response.lastTrainingDate()).isEqualTo(LocalDate.of(2025, 1, 15));

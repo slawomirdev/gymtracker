@@ -29,6 +29,13 @@ public interface TrainingSetRepository extends JpaRepository<TrainingSet, Long> 
     BigDecimal sumVolumeByUserId(@Param("userId") Long userId);
 
     @Query("""
+            select coalesce(sum(s.reps), 0)
+            from TrainingSet s
+            where s.training.user.id = :userId
+            """)
+    Long sumRepsByUserId(@Param("userId") Long userId);
+
+    @Query("""
             select e.id as exerciseId,
                    e.name as exerciseName,
                    count(s.id) as totalSets,
