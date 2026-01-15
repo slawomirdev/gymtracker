@@ -100,7 +100,26 @@ public class UiController {
                               @RequestParam(required = false) String imageUrl,
                               @RequestParam(defaultValue = "false") boolean active,
                               RedirectAttributes redirectAttributes) {
-        exerciseService.createExercise(new ExerciseRequest(name, description, imageUrl, active));
+        String trimmedName = emptyToNull(name);
+        if (trimmedName == null) {
+            redirectAttributes.addFlashAttribute("error", "Nazwa cwiczenia jest wymagana.");
+            return "redirect:/";
+        }
+        if (trimmedName.length() > 100) {
+            redirectAttributes.addFlashAttribute("error", "Nazwa cwiczenia jest za dluga (max 100).");
+            return "redirect:/";
+        }
+        String trimmedDescription = emptyToNull(description);
+        if (trimmedDescription != null && trimmedDescription.length() > 500) {
+            redirectAttributes.addFlashAttribute("error", "Opis cwiczenia jest za dlugi (max 500).");
+            return "redirect:/";
+        }
+        String trimmedImageUrl = emptyToNull(imageUrl);
+        if (trimmedImageUrl != null && trimmedImageUrl.length() > 300) {
+            redirectAttributes.addFlashAttribute("error", "Link do zdjecia jest za dlugi (max 300).");
+            return "redirect:/";
+        }
+        exerciseService.createExercise(new ExerciseRequest(trimmedName, trimmedDescription, trimmedImageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie dodane.");
         return "redirect:/";
     }
@@ -113,13 +132,46 @@ public class UiController {
                               @RequestParam(required = false) String bodyWeight,
                               @RequestParam(required = false) String durationMinutes,
                               RedirectAttributes redirectAttributes) {
+        if (isBlank(date)) {
+            redirectAttributes.addFlashAttribute("error", "Data treningu jest wymagana.");
+            return "redirect:/";
+        }
+        java.time.LocalDate trainingDate;
+        try {
+            trainingDate = java.time.LocalDate.parse(date.trim());
+        } catch (java.time.format.DateTimeParseException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawny format daty treningu.");
+            return "redirect:/";
+        }
+        java.math.BigDecimal parsedBodyWeight;
+        try {
+            parsedBodyWeight = parseBigDecimal(bodyWeight);
+        } catch (NumberFormatException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawna waga ciala.");
+            return "redirect:/";
+        }
+        if (parsedBodyWeight != null && parsedBodyWeight.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            redirectAttributes.addFlashAttribute("error", "Waga ciala musi byc >= 0.");
+            return "redirect:/";
+        }
+        Integer parsedDuration;
+        try {
+            parsedDuration = parseInteger(durationMinutes);
+        } catch (NumberFormatException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawny czas trwania.");
+            return "redirect:/";
+        }
+        if (parsedDuration != null && parsedDuration <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Czas trwania musi byc > 0.");
+            return "redirect:/";
+        }
         trainingService.createTraining(new TrainingCreateRequest(
-                java.time.LocalDate.parse(date),
-                note,
+                trainingDate,
+                emptyToNull(note),
                 emptyToNull(intensity),
                 emptyToNull(location),
-                parseBigDecimal(bodyWeight),
-                parseInteger(durationMinutes)
+                parsedBodyWeight,
+                parsedDuration
         ));
         redirectAttributes.addFlashAttribute("message", "Trening dodany.");
         return "redirect:/";
@@ -132,7 +184,26 @@ public class UiController {
                                  @RequestParam(required = false) String imageUrl,
                                  @RequestParam(defaultValue = "false") boolean active,
                                  RedirectAttributes redirectAttributes) {
-        exerciseService.updateExercise(id, new ExerciseRequest(name, description, imageUrl, active));
+        String trimmedName = emptyToNull(name);
+        if (trimmedName == null) {
+            redirectAttributes.addFlashAttribute("error", "Nazwa cwiczenia jest wymagana.");
+            return "redirect:/manage";
+        }
+        if (trimmedName.length() > 100) {
+            redirectAttributes.addFlashAttribute("error", "Nazwa cwiczenia jest za dluga (max 100).");
+            return "redirect:/manage";
+        }
+        String trimmedDescription = emptyToNull(description);
+        if (trimmedDescription != null && trimmedDescription.length() > 500) {
+            redirectAttributes.addFlashAttribute("error", "Opis cwiczenia jest za dlugi (max 500).");
+            return "redirect:/manage";
+        }
+        String trimmedImageUrl = emptyToNull(imageUrl);
+        if (trimmedImageUrl != null && trimmedImageUrl.length() > 300) {
+            redirectAttributes.addFlashAttribute("error", "Link do zdjecia jest za dlugi (max 300).");
+            return "redirect:/manage";
+        }
+        exerciseService.updateExercise(id, new ExerciseRequest(trimmedName, trimmedDescription, trimmedImageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie zaktualizowane.");
         return "redirect:/manage";
     }
@@ -153,13 +224,46 @@ public class UiController {
                                  @RequestParam(required = false) String bodyWeight,
                                  @RequestParam(required = false) String durationMinutes,
                                  RedirectAttributes redirectAttributes) {
+        if (isBlank(date)) {
+            redirectAttributes.addFlashAttribute("error", "Data treningu jest wymagana.");
+            return "redirect:/manage";
+        }
+        java.time.LocalDate trainingDate;
+        try {
+            trainingDate = java.time.LocalDate.parse(date.trim());
+        } catch (java.time.format.DateTimeParseException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawny format daty treningu.");
+            return "redirect:/manage";
+        }
+        java.math.BigDecimal parsedBodyWeight;
+        try {
+            parsedBodyWeight = parseBigDecimal(bodyWeight);
+        } catch (NumberFormatException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawna waga ciala.");
+            return "redirect:/manage";
+        }
+        if (parsedBodyWeight != null && parsedBodyWeight.compareTo(java.math.BigDecimal.ZERO) < 0) {
+            redirectAttributes.addFlashAttribute("error", "Waga ciala musi byc >= 0.");
+            return "redirect:/manage";
+        }
+        Integer parsedDuration;
+        try {
+            parsedDuration = parseInteger(durationMinutes);
+        } catch (NumberFormatException ex) {
+            redirectAttributes.addFlashAttribute("error", "Niepoprawny czas trwania.");
+            return "redirect:/manage";
+        }
+        if (parsedDuration != null && parsedDuration <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Czas trwania musi byc > 0.");
+            return "redirect:/manage";
+        }
         trainingService.updateTraining(id, new TrainingCreateRequest(
-                java.time.LocalDate.parse(date),
-                note,
+                trainingDate,
+                emptyToNull(note),
                 emptyToNull(intensity),
                 emptyToNull(location),
-                parseBigDecimal(bodyWeight),
-                parseInteger(durationMinutes)
+                parsedBodyWeight,
+                parsedDuration
         ));
         redirectAttributes.addFlashAttribute("message", "Trening zaktualizowany.");
         return "redirect:/manage";
@@ -178,6 +282,18 @@ public class UiController {
                          @RequestParam Integer reps,
                          @RequestParam BigDecimal weight,
                          RedirectAttributes redirectAttributes) {
+        if (exerciseId == null) {
+            redirectAttributes.addFlashAttribute("error", "Wybierz cwiczenie.");
+            return "redirect:/";
+        }
+        if (reps == null || reps <= 0) {
+            redirectAttributes.addFlashAttribute("error", "Liczba powtorzen musi byc > 0.");
+            return "redirect:/";
+        }
+        if (weight == null || weight.compareTo(BigDecimal.ZERO) < 0) {
+            redirectAttributes.addFlashAttribute("error", "Ciezar musi byc >= 0.");
+            return "redirect:/";
+        }
         trainingSetService.addSet(trainingId, new TrainingSetRequest(exerciseId, reps, weight));
         redirectAttributes.addFlashAttribute("message", "Seria dodana.");
         return "redirect:/";
@@ -200,6 +316,10 @@ public class UiController {
         requests.addAll(buildFromForm(bulkForm));
         if (requests.isEmpty() && bulkLines != null) {
             requests.addAll(buildFromLegacyLines(bulkLines));
+        }
+        if (requests.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Nie znaleziono poprawnych cwiczen do dodania.");
+            return "redirect:/manage";
         }
         for (ExerciseRequest request : requests) {
             exerciseService.createExercise(request);
@@ -228,6 +348,10 @@ public class UiController {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     private boolean parseBoolean(String raw) {

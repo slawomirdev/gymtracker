@@ -1,7 +1,13 @@
 # GymTracker
 
-Prosta aplikacja do planowania treningow i zapisywania serii. Backend to REST API na Spring Boot, dane trwale
-w relacyjnej bazie PostgreSQL, a UI to lekki panel oparty o Bootstrap.
+GymTracker to aplikacja webowa MVC w Spring Boot + Thymeleaf. UI (formularze, redirect 302) jest glownym sposobem pracy,
+a REST API `/api` jest dodatkiem wykorzystywanym opcjonalnie.
+
+## Wariant projektu: Wariant II (MVC)
+- Widoki: Thymeleaf + Bootstrap (`/`, `/manage`, `/history`, `/stats`).
+- Kontrolery UI steruja przeplywem i deleguja logike do serwisow.
+- Logika biznesowa jest w warstwie `service`, dostep do danych w `repository` (Spring Data JPA).
+- Kontrolery REST sa oddzielone i maja prefiks `/api`, bez mieszania z UI.
 
 ## Specyfikacja
 ### Wymagania funkcjonalne
@@ -11,9 +17,9 @@ w relacyjnej bazie PostgreSQL, a UI to lekki panel oparty o Bootstrap.
 4) Uzytkownik moze przegladac historie serii dla wybranego cwiczenia.
 
 ### Wymagania pozafunkcjonalne
-1) Walidacja danych wejsciowych z czytelnymi komunikatami bledow.
+1) Walidacja danych wejsciowych z czytelnymi komunikatami bledow w UI.
 2) Spojny format bledow w JSON i poprawne kody HTTP w API.
-3) Projekt zawiera testy automatyczne uruchamiane komenda ./mvnw test.
+3) Projekt zawiera testy automatyczne uruchamiane komenda `./mvnw test`.
 
 ### Krotki opis projektu
 GymTracker to aplikacja webowa, ktora pozwala planowac treningi i prowadzic dziennik serii,
@@ -50,7 +56,29 @@ Logowanie nie jest wymagane. UI i REST API sa dostepne bez autoryzacji.
 W bazie danych istnieje uzytkownik techniczny (demo), do ktorego przypisywane sa dane.
 Spring Security jest uzyte w projekcie, ale konfiguracja dopuszcza dostep publiczny (permitAll) do UI i API.
 
-## Glowne endpointy REST
+## Widoki UI (glowny interfejs)
+- `/` - dashboard (dodawanie, lista treningow i serii)
+- `/history` - historia serii dla wybranego cwiczenia
+- `/stats` - podsumowanie i statystyki cwiczen
+- `/manage` - edycja i usuwanie cwiczen oraz treningow
+
+## Dodawanie wielu cwiczen z UI
+- Kliknij przycisk `Dodaj kilka cwiczen` na pulpicie, aby otworzyc modal z lista wierszy.
+- Kazdy wiersz to jedno cwiczenie: nazwa jest wymagana, reszta pol jest opcjonalna.
+- Dodawaj lub usuwaj wiersze przyciskami w modalu; puste wiersze sa automatycznie pomijane przy zapisie.
+- Status aktywnosci ustawiasz per wiersz, bez wklejania danych zrodel oddzielonych srednikami.
+
+## Architektura MVC i separacja warstw
+- `pl.wsb.students.gymtracker.web` - kontrolery UI (Thymeleaf, formularze, redirect).
+- `pl.wsb.students.gymtracker.service` - logika biznesowa i przypadki uzycia.
+- `pl.wsb.students.gymtracker.repository` - dostep do danych (Spring Data JPA).
+- `pl.wsb.students.gymtracker.domain` - encje JPA.
+- `pl.wsb.students.gymtracker.api` - REST API (dodatkowe).
+
+## REST API (dodatkowe)
+REST API jest dodatkiem do aplikacji MVC i nie jest glownym sposobem pracy z systemem.
+
+### Glowne endpointy REST
 - `GET /api/exercises` - lista cwiczen
 - `POST /api/exercises` - tworzenie cwiczenia
 - `GET /api/exercises/{id}` - szczegoly cwiczenia
@@ -66,23 +94,11 @@ Spring Security jest uzyte w projekcie, ale konfiguracja dopuszcza dostep public
 - `GET /api/stats/summary` - podsumowanie statystyk
 - `GET /api/stats/exercises` - statystyki per cwiczenie
 
-## Swagger / OpenAPI
+### Swagger / OpenAPI
 - UI: `http://localhost:8080/swagger-ui/index.html`
 - Specyfikacja JSON: `http://localhost:8080/v3/api-docs`
 
-## Widoki UI
-- `/` - dashboard (dodawanie, lista treningow i serii)
-- `/history` - historia serii dla wybranego cwiczenia
-- `/stats` - podsumowanie i statystyki cwiczen
-- `/manage` - edycja i usuwanie cwiczen oraz treningow
-
-## Dodawanie wielu cwiczen z UI
-- Kliknij przycisk `Dodaj kilka cwiczen` na pulpicie, aby otworzyc modal z lista wierszy.
-- Kazdy wiersz to jedno cwiczenie: nazwa jest wymagana, reszta pol jest opcjonalna.
-- Dodawaj lub usuwaj wiersze przyciskami w modalu; puste wiersze sa automatycznie pomijane przy zapisie.
-- Status aktywnosci ustawiasz per wiersz, bez wklejania danych zrodel oddzielonych srednikami.
-
-## Przykladowe requesty
+### Przykladowe requesty
 ```bash
 curl -H "Content-Type: application/json" \
   -d '{"name":"Przysiad","description":"Stabilizacja core"}' \
@@ -197,6 +213,7 @@ Projekt zawiera minimum 4 testy automatyczne:
 - `src/test/java/pl/wsb/students/gymtracker/service/TrainingServiceTest.java`
 - `src/test/java/pl/wsb/students/gymtracker/service/TrainingSetServiceTest.java`
 - `src/test/java/pl/wsb/students/gymtracker/service/StatsServiceTest.java`
+- `src/test/java/pl/wsb/students/gymtracker/api/ApiIntegrationTests.java`
 
 ```bash
 ./mvnw test

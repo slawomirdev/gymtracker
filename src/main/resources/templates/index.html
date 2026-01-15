@@ -28,6 +28,7 @@
 </nav>
 
 <main class="container gt-hero">
+    <div th:if="${error}" class="alert alert-danger mt-3" th:text="${error}">Blad</div>
     <div th:if="${message}" class="alert alert-success mt-3" th:text="${message}">Status</div>
     <div class="row align-items-center g-4">
         <div class="col-lg-7">
