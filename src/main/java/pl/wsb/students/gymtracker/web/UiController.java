@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -192,26 +193,18 @@ public class UiController {
     }
 
     @PostMapping("/ui/exercises/bulk")
-    public String addExercisesBulk(@RequestParam String bulkLines, RedirectAttributes redirectAttributes) {
-        String[] lines = bulkLines.split("\\r?\\n");
-        int added = 0;
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (trimmed.isEmpty()) {
-                continue;
-            }
-            String[] parts = trimmed.split(";", -1);
-            String name = parts[0].trim();
-            if (name.isEmpty()) {
-                continue;
-            }
-            String description = parts.length > 1 ? emptyToNull(parts[1]) : null;
-            String imageUrl = parts.length > 2 ? emptyToNull(parts[2]) : null;
-            Boolean active = parts.length > 3 ? parseBoolean(parts[3]) : true;
-            exerciseService.createExercise(new ExerciseRequest(name, description, imageUrl, active));
-            added++;
+    public String addExercisesBulk(@ModelAttribute BulkExerciseForm bulkForm,
+                                   @RequestParam(required = false) String bulkLines,
+                                   RedirectAttributes redirectAttributes) {
+        List<ExerciseRequest> requests = new ArrayList<>();
+        requests.addAll(buildFromForm(bulkForm));
+        if (requests.isEmpty() && bulkLines != null) {
+            requests.addAll(buildFromLegacyLines(bulkLines));
         }
-        redirectAttributes.addFlashAttribute("message", "Dodano cwiczenia: " + added + ".");
+        for (ExerciseRequest request : requests) {
+            exerciseService.createExercise(request);
+        }
+        redirectAttributes.addFlashAttribute("message", "Dodano cwiczenia: " + requests.size() + ".");
         return "redirect:/manage";
     }
 
@@ -243,5 +236,101 @@ public class UiController {
         }
         String value = raw.trim().toLowerCase();
         return !(value.equals("false") || value.equals("0") || value.equals("nie"));
+    }
+
+    private List<ExerciseRequest> buildFromForm(BulkExerciseForm bulkForm) {
+        List<ExerciseRequest> requests = new ArrayList<>();
+        if (bulkForm == null || bulkForm.getExercises() == null) {
+            return requests;
+        }
+        for (BulkExerciseRow row : bulkForm.getExercises()) {
+            if (row == null) {
+                continue;
+            }
+            String name = emptyToNull(row.getName());
+            if (name == null) {
+                continue;
+            }
+            String description = emptyToNull(row.getDescription());
+            String imageUrl = emptyToNull(row.getImageUrl());
+            boolean active = row.getActive() == null || row.getActive();
+            requests.add(new ExerciseRequest(name, description, imageUrl, active));
+        }
+        return requests;
+    }
+
+    private List<ExerciseRequest> buildFromLegacyLines(String bulkLines) {
+        List<ExerciseRequest> requests = new ArrayList<>();
+        if (bulkLines == null) {
+            return requests;
+        }
+        String[] lines = bulkLines.split("\\r?\\n");
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            String[] parts = trimmed.split(";", -1);
+            String name = parts[0].trim();
+            if (name.isEmpty()) {
+                continue;
+            }
+            String description = parts.length > 1 ? emptyToNull(parts[1]) : null;
+            String imageUrl = parts.length > 2 ? emptyToNull(parts[2]) : null;
+            Boolean active = parts.length > 3 ? parseBoolean(parts[3]) : true;
+            requests.add(new ExerciseRequest(name, description, imageUrl, active));
+        }
+        return requests;
+    }
+
+    public static class BulkExerciseForm {
+        private List<BulkExerciseRow> exercises = new ArrayList<>();
+
+        public List<BulkExerciseRow> getExercises() {
+            return exercises;
+        }
+
+        public void setExercises(List<BulkExerciseRow> exercises) {
+            this.exercises = exercises;
+        }
+    }
+
+    public static class BulkExerciseRow {
+        private String name;
+        private String description;
+        private String imageUrl;
+        private Boolean active;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
+
+        public Boolean getActive() {
+            return active;
+        }
+
+        public void setActive(Boolean active) {
+            this.active = active;
+        }
     }
 }

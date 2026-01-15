@@ -76,6 +76,12 @@ Spring Security jest uzyte w projekcie, ale konfiguracja dopuszcza dostep public
 - `/stats` - podsumowanie i statystyki cwiczen
 - `/manage` - edycja i usuwanie cwiczen oraz treningow
 
+## Dodawanie wielu cwiczen z UI
+- Kliknij przycisk `Dodaj kilka cwiczen` na pulpicie, aby otworzyc modal z lista wierszy.
+- Kazdy wiersz to jedno cwiczenie: nazwa jest wymagana, reszta pol jest opcjonalna.
+- Dodawaj lub usuwaj wiersze przyciskami w modalu; puste wiersze sa automatycznie pomijane przy zapisie.
+- Status aktywnosci ustawiasz per wiersz, bez wklejania danych zrodel oddzielonych srednikami.
+
 ## Przykladowe requesty
 ```bash
 curl -H "Content-Type: application/json" \
