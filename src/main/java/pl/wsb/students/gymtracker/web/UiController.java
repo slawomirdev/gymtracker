@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.wsb.students.gymtracker.api.dto.ExerciseRequest;
-import pl.wsb.students.gymtracker.api.dto.TrainingCreateRequest;
-import pl.wsb.students.gymtracker.api.dto.TrainingSetRequest;
 import pl.wsb.students.gymtracker.service.ExerciseService;
 import pl.wsb.students.gymtracker.service.StatsService;
 import pl.wsb.students.gymtracker.service.TrainingService;
 import pl.wsb.students.gymtracker.service.TrainingSetService;
 import pl.wsb.students.gymtracker.service.UserService;
+import pl.wsb.students.gymtracker.service.dto.ExerciseCommand;
+import pl.wsb.students.gymtracker.service.dto.TrainingCommand;
+import pl.wsb.students.gymtracker.service.dto.TrainingSetCommand;
 
 @Controller
 public class UiController {
@@ -119,7 +119,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Link do zdjecia jest za dlugi (max 300).");
             return "redirect:/";
         }
-        exerciseService.createExercise(new ExerciseRequest(trimmedName, trimmedDescription, trimmedImageUrl, active));
+        exerciseService.createExercise(new ExerciseCommand(trimmedName, trimmedDescription, trimmedImageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie dodane.");
         return "redirect:/";
     }
@@ -165,7 +165,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Czas trwania musi byc > 0.");
             return "redirect:/";
         }
-        trainingService.createTraining(new TrainingCreateRequest(
+        trainingService.createTraining(new TrainingCommand(
                 trainingDate,
                 emptyToNull(note),
                 emptyToNull(intensity),
@@ -203,7 +203,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Link do zdjecia jest za dlugi (max 300).");
             return "redirect:/manage";
         }
-        exerciseService.updateExercise(id, new ExerciseRequest(trimmedName, trimmedDescription, trimmedImageUrl, active));
+        exerciseService.updateExercise(id, new ExerciseCommand(trimmedName, trimmedDescription, trimmedImageUrl, active));
         redirectAttributes.addFlashAttribute("message", "Cwiczenie zaktualizowane.");
         return "redirect:/manage";
     }
@@ -257,7 +257,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Czas trwania musi byc > 0.");
             return "redirect:/manage";
         }
-        trainingService.updateTraining(id, new TrainingCreateRequest(
+        trainingService.updateTraining(id, new TrainingCommand(
                 trainingDate,
                 emptyToNull(note),
                 emptyToNull(intensity),
@@ -294,7 +294,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Ciezar musi byc >= 0.");
             return "redirect:/";
         }
-        trainingSetService.addSet(trainingId, new TrainingSetRequest(exerciseId, reps, weight));
+        trainingSetService.addSet(trainingId, new TrainingSetCommand(exerciseId, reps, weight));
         redirectAttributes.addFlashAttribute("message", "Seria dodana.");
         return "redirect:/";
     }
@@ -312,7 +312,7 @@ public class UiController {
     public String addExercisesBulk(@ModelAttribute BulkExerciseForm bulkForm,
                                    @RequestParam(required = false) String bulkLines,
                                    RedirectAttributes redirectAttributes) {
-        List<ExerciseRequest> requests = new ArrayList<>();
+        List<ExerciseCommand> requests = new ArrayList<>();
         requests.addAll(buildFromForm(bulkForm));
         if (requests.isEmpty() && bulkLines != null) {
             requests.addAll(buildFromLegacyLines(bulkLines));
@@ -321,7 +321,7 @@ public class UiController {
             redirectAttributes.addFlashAttribute("error", "Nie znaleziono poprawnych cwiczen do dodania.");
             return "redirect:/manage";
         }
-        for (ExerciseRequest request : requests) {
+        for (ExerciseCommand request : requests) {
             exerciseService.createExercise(request);
         }
         redirectAttributes.addFlashAttribute("message", "Dodano cwiczenia: " + requests.size() + ".");
@@ -362,8 +362,8 @@ public class UiController {
         return !(value.equals("false") || value.equals("0") || value.equals("nie"));
     }
 
-    private List<ExerciseRequest> buildFromForm(BulkExerciseForm bulkForm) {
-        List<ExerciseRequest> requests = new ArrayList<>();
+    private List<ExerciseCommand> buildFromForm(BulkExerciseForm bulkForm) {
+        List<ExerciseCommand> requests = new ArrayList<>();
         if (bulkForm == null || bulkForm.getExercises() == null) {
             return requests;
         }
@@ -378,13 +378,13 @@ public class UiController {
             String description = emptyToNull(row.getDescription());
             String imageUrl = emptyToNull(row.getImageUrl());
             boolean active = row.getActive() == null || row.getActive();
-            requests.add(new ExerciseRequest(name, description, imageUrl, active));
+            requests.add(new ExerciseCommand(name, description, imageUrl, active));
         }
         return requests;
     }
 
-    private List<ExerciseRequest> buildFromLegacyLines(String bulkLines) {
-        List<ExerciseRequest> requests = new ArrayList<>();
+    private List<ExerciseCommand> buildFromLegacyLines(String bulkLines) {
+        List<ExerciseCommand> requests = new ArrayList<>();
         if (bulkLines == null) {
             return requests;
         }
@@ -402,7 +402,7 @@ public class UiController {
             String description = parts.length > 1 ? emptyToNull(parts[1]) : null;
             String imageUrl = parts.length > 2 ? emptyToNull(parts[2]) : null;
             Boolean active = parts.length > 3 ? parseBoolean(parts[3]) : true;
-            requests.add(new ExerciseRequest(name, description, imageUrl, active));
+            requests.add(new ExerciseCommand(name, description, imageUrl, active));
         }
         return requests;
     }

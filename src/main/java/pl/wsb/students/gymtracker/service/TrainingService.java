@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import pl.wsb.students.gymtracker.api.dto.TrainingCreateRequest;
 import pl.wsb.students.gymtracker.api.error.NotFoundException;
 import pl.wsb.students.gymtracker.domain.AppUser;
 import pl.wsb.students.gymtracker.domain.Training;
 import pl.wsb.students.gymtracker.repository.TrainingRepository;
+import pl.wsb.students.gymtracker.service.dto.TrainingCommand;
 
 @Service
 public class TrainingService {
@@ -48,30 +48,30 @@ public class TrainingService {
     }
 
     @Transactional
-    public Training createTraining(TrainingCreateRequest request) {
+    public Training createTraining(TrainingCommand command) {
         AppUser user = userService.getCurrentUser();
         Training training = new Training();
         training.setUser(user);
-        training.setTrainingDate(request.date());
-        training.setNote(request.note());
-        training.setIntensity(request.intensity());
-        training.setLocation(request.location());
-        training.setBodyWeight(request.bodyWeight());
-        training.setDurationMinutes(request.durationMinutes());
+        training.setTrainingDate(command.date());
+        training.setNote(command.note());
+        training.setIntensity(command.intensity());
+        training.setLocation(command.location());
+        training.setBodyWeight(command.bodyWeight());
+        training.setDurationMinutes(command.durationMinutes());
         Training saved = trainingRepository.save(training);
         logger.info("Created training {} for user {}", saved.getId(), user.getId());
         return saved;
     }
 
     @Transactional
-    public Training updateTraining(Long id, TrainingCreateRequest request) {
+    public Training updateTraining(Long id, TrainingCommand command) {
         Training training = getTraining(id);
-        training.setTrainingDate(request.date());
-        training.setNote(request.note());
-        training.setIntensity(request.intensity());
-        training.setLocation(request.location());
-        training.setBodyWeight(request.bodyWeight());
-        training.setDurationMinutes(request.durationMinutes());
+        training.setTrainingDate(command.date());
+        training.setNote(command.note());
+        training.setIntensity(command.intensity());
+        training.setLocation(command.location());
+        training.setBodyWeight(command.bodyWeight());
+        training.setDurationMinutes(command.durationMinutes());
         return trainingRepository.save(training);
     }
 

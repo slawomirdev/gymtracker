@@ -22,6 +22,8 @@ import pl.wsb.students.gymtracker.domain.TrainingSet;
 import pl.wsb.students.gymtracker.service.TrainingService;
 import pl.wsb.students.gymtracker.service.TrainingSetService;
 import pl.wsb.students.gymtracker.service.UserService;
+import pl.wsb.students.gymtracker.service.dto.TrainingCommand;
+import pl.wsb.students.gymtracker.service.dto.TrainingSetCommand;
 
 @RestController
 @RequestMapping("/api/trainings")
@@ -48,7 +50,7 @@ public class TrainingController {
 
     @PostMapping
     public ResponseEntity<TrainingResponse> create(@Valid @RequestBody TrainingCreateRequest request) {
-        Training created = trainingService.createTraining(request);
+        Training created = trainingService.createTraining(toCommand(request));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getId())
@@ -63,13 +65,13 @@ public class TrainingController {
 
     @PutMapping("/{id}")
     public TrainingResponse update(@PathVariable Long id, @Valid @RequestBody TrainingCreateRequest request) {
-        return toResponse(trainingService.updateTraining(id, request));
+        return toResponse(trainingService.updateTraining(id, toCommand(request)));
     }
 
     @PostMapping("/{id}/sets")
     public ResponseEntity<TrainingSetResponse> addSet(@PathVariable Long id,
                                                       @Valid @RequestBody TrainingSetRequest request) {
-        TrainingSet created = trainingSetService.addSet(id, request);
+        TrainingSet created = trainingSetService.addSet(id, toCommand(request));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{setId}")
                 .buildAndExpand(created.getId())
@@ -106,6 +108,25 @@ public class TrainingController {
                 set.getExercise().getName(),
                 set.getReps(),
                 set.getWeight()
+        );
+    }
+
+    private TrainingCommand toCommand(TrainingCreateRequest request) {
+        return new TrainingCommand(
+                request.date(),
+                request.note(),
+                request.intensity(),
+                request.location(),
+                request.bodyWeight(),
+                request.durationMinutes()
+        );
+    }
+
+    private TrainingSetCommand toCommand(TrainingSetRequest request) {
+        return new TrainingSetCommand(
+                request.exerciseId(),
+                request.reps(),
+                request.weight()
         );
     }
 }

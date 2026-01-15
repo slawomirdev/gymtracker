@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.wsb.students.gymtracker.api.dto.ExerciseRequest;
 import pl.wsb.students.gymtracker.api.error.NotFoundException;
 import pl.wsb.students.gymtracker.domain.AppUser;
 import pl.wsb.students.gymtracker.domain.Exercise;
 import pl.wsb.students.gymtracker.repository.ExerciseRepository;
+import pl.wsb.students.gymtracker.service.dto.ExerciseCommand;
 
 @Service
 public class ExerciseService {
@@ -45,27 +45,27 @@ public class ExerciseService {
     }
 
     @Transactional
-    public Exercise createExercise(ExerciseRequest request) {
+    public Exercise createExercise(ExerciseCommand command) {
         AppUser user = userService.getCurrentUser();
         Exercise exercise = new Exercise();
         exercise.setUser(user);
-        exercise.setName(request.name());
-        exercise.setDescription(request.description());
-        exercise.setImageUrl(request.imageUrl());
-        exercise.setActive(request.active() == null || request.active());
+        exercise.setName(command.name());
+        exercise.setDescription(command.description());
+        exercise.setImageUrl(command.imageUrl());
+        exercise.setActive(command.active() == null || command.active());
         Exercise saved = exerciseRepository.save(exercise);
         logger.info("Created exercise {} for user {}", saved.getId(), user.getId());
         return saved;
     }
 
     @Transactional
-    public Exercise updateExercise(Long id, ExerciseRequest request) {
+    public Exercise updateExercise(Long id, ExerciseCommand command) {
         Exercise exercise = getExercise(id);
-        exercise.setName(request.name());
-        exercise.setDescription(request.description());
-        exercise.setImageUrl(request.imageUrl());
-        if (request.active() != null) {
-            exercise.setActive(request.active());
+        exercise.setName(command.name());
+        exercise.setDescription(command.description());
+        exercise.setImageUrl(command.imageUrl());
+        if (command.active() != null) {
+            exercise.setActive(command.active());
         }
         return exerciseRepository.save(exercise);
     }

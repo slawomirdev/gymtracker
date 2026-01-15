@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
-import pl.wsb.students.gymtracker.api.dto.TrainingSetRequest;
 import pl.wsb.students.gymtracker.api.error.NotFoundException;
 import pl.wsb.students.gymtracker.domain.Exercise;
 import pl.wsb.students.gymtracker.domain.Training;
 import pl.wsb.students.gymtracker.domain.TrainingSet;
 import pl.wsb.students.gymtracker.repository.TrainingSetRepository;
+import pl.wsb.students.gymtracker.service.dto.TrainingSetCommand;
 
 @Service
 public class TrainingSetService {
@@ -31,14 +31,14 @@ public class TrainingSetService {
     }
 
     @Transactional
-    public TrainingSet addSet(Long trainingId, TrainingSetRequest request) {
+    public TrainingSet addSet(Long trainingId, TrainingSetCommand command) {
         Training training = trainingService.getTraining(trainingId);
-        Exercise exercise = exerciseService.getExercise(request.exerciseId());
+        Exercise exercise = exerciseService.getExercise(command.exerciseId());
         TrainingSet set = new TrainingSet();
         set.setTraining(training);
         set.setExercise(exercise);
-        set.setReps(request.reps());
-        set.setWeight(request.weight());
+        set.setReps(command.reps());
+        set.setWeight(command.weight());
         TrainingSet saved = trainingSetRepository.save(set);
         logger.info("Added set {} to training {}", saved.getId(), trainingId);
         return saved;

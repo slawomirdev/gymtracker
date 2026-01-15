@@ -17,6 +17,7 @@ import pl.wsb.students.gymtracker.api.dto.ExerciseRequest;
 import pl.wsb.students.gymtracker.api.dto.ExerciseResponse;
 import pl.wsb.students.gymtracker.domain.Exercise;
 import pl.wsb.students.gymtracker.service.ExerciseService;
+import pl.wsb.students.gymtracker.service.dto.ExerciseCommand;
 
 @RestController
 @RequestMapping("/api/exercises")
@@ -42,7 +43,7 @@ public class ExerciseController {
 
     @PostMapping
     public ResponseEntity<ExerciseResponse> create(@Valid @RequestBody ExerciseRequest request) {
-        Exercise created = exerciseService.createExercise(request);
+        Exercise created = exerciseService.createExercise(toCommand(request));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getId())
@@ -52,7 +53,7 @@ public class ExerciseController {
 
     @PutMapping("/{id}")
     public ExerciseResponse update(@PathVariable Long id, @Valid @RequestBody ExerciseRequest request) {
-        return toResponse(exerciseService.updateExercise(id, request));
+        return toResponse(exerciseService.updateExercise(id, toCommand(request)));
     }
 
     @DeleteMapping("/{id}")
@@ -68,6 +69,15 @@ public class ExerciseController {
                 exercise.getDescription(),
                 exercise.getImageUrl(),
                 exercise.getActive()
+        );
+    }
+
+    private ExerciseCommand toCommand(ExerciseRequest request) {
+        return new ExerciseCommand(
+                request.name(),
+                request.description(),
+                request.imageUrl(),
+                request.active()
         );
     }
 }

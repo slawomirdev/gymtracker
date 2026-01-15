@@ -11,11 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.wsb.students.gymtracker.api.dto.TrainingSetRequest;
 import pl.wsb.students.gymtracker.domain.Exercise;
 import pl.wsb.students.gymtracker.domain.Training;
 import pl.wsb.students.gymtracker.domain.TrainingSet;
 import pl.wsb.students.gymtracker.repository.TrainingSetRepository;
+import pl.wsb.students.gymtracker.service.dto.TrainingSetCommand;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingSetServiceTest {
@@ -42,7 +42,7 @@ class TrainingSetServiceTest {
         when(exerciseService.getExercise(9L)).thenReturn(exercise);
         when(trainingSetRepository.save(any(TrainingSet.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        TrainingSetRequest request = new TrainingSetRequest(9L, 8, new BigDecimal("100"));
+        TrainingSetCommand request = new TrainingSetCommand(9L, 8, new BigDecimal("100"));
         TrainingSet saved = trainingSetService.addSet(3L, request);
 
         assertThat(saved.getTraining()).isEqualTo(training);

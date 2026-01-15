@@ -71,6 +71,7 @@ Spring Security jest uzyte w projekcie, ale konfiguracja dopuszcza dostep public
 ## Architektura MVC i separacja warstw
 - `pl.wsb.students.gymtracker.web` - kontrolery UI (Thymeleaf, formularze, redirect).
 - `pl.wsb.students.gymtracker.service` - logika biznesowa i przypadki uzycia.
+- `pl.wsb.students.gymtracker.service.dto` - komendy aplikacyjne niezalezne od warstwy UI i REST.
 - `pl.wsb.students.gymtracker.repository` - dostep do danych (Spring Data JPA).
 - `pl.wsb.students.gymtracker.domain` - encje JPA.
 - `pl.wsb.students.gymtracker.api` - REST API (dodatkowe).

@@ -11,10 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.wsb.students.gymtracker.api.dto.TrainingCreateRequest;
 import pl.wsb.students.gymtracker.domain.AppUser;
 import pl.wsb.students.gymtracker.domain.Training;
 import pl.wsb.students.gymtracker.repository.TrainingRepository;
+import pl.wsb.students.gymtracker.service.dto.TrainingCommand;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingServiceTest {
@@ -36,7 +36,7 @@ class TrainingServiceTest {
         when(trainingRepository.save(any(Training.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         LocalDate date = LocalDate.of(2025, 1, 10);
-        TrainingCreateRequest request = new TrainingCreateRequest(
+        TrainingCommand request = new TrainingCommand(
                 date,
                 "Sila + mobilnosc",
                 "srednia",

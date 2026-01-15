@@ -10,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.wsb.students.gymtracker.api.dto.ExerciseRequest;
 import pl.wsb.students.gymtracker.domain.AppUser;
 import pl.wsb.students.gymtracker.domain.Exercise;
 import pl.wsb.students.gymtracker.repository.ExerciseRepository;
+import pl.wsb.students.gymtracker.service.dto.ExerciseCommand;
 
 @ExtendWith(MockitoExtension.class)
 class ExerciseServiceTest {
@@ -34,7 +34,7 @@ class ExerciseServiceTest {
         when(userService.getCurrentUser()).thenReturn(user);
         when(exerciseRepository.save(any(Exercise.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ExerciseRequest request = new ExerciseRequest(
+        ExerciseCommand request = new ExerciseCommand(
                 "Wyciskanie",
                 "Sila klatki",
                 "https://example.com/wyciskanie.jpg",
